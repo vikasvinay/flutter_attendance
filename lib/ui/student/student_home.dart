@@ -1,0 +1,252 @@
+import 'package:attendance_app/bloc/add_log/log_bloc.dart';
+import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
+import 'package:attendance_app/bloc/auth/auth_bloc.dart';
+import 'package:attendance_app/model/subject_model.dart';
+import 'package:attendance_app/model/user_model.dart';
+import 'package:attendance_app/routing/fluro_route.dart';
+import 'package:attendance_app/routing/page_name.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:paginate_firestore/paginate_firestore.dart';
+
+class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late AuthBloc _authBloc;
+  late SubjectBloc _subjectBloc;
+  late LogBloc _logBloc;
+  TextEditingController _subjectName = TextEditingController();
+  @override
+  void initState() {
+    _authBloc = BlocProvider.of<AuthBloc>(context);
+    _subjectBloc = BlocProvider.of<SubjectBloc>(context);
+    _logBloc = BlocProvider.of<LogBloc>(context);
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: _popUp,
+          label: Text('Subject'),
+          icon: Icon(Icons.add),
+        ),
+        drawer: Drawer(
+          child: FutureBuilder(
+              future: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .get(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+                UsersModel user = UsersModel.fromFireStore(doc: snapshot);
+                return SafeArea(
+                  child: Column(
+                    children: [
+                      SizedBox(
+                        height: 40.h,
+                      ),
+                      CircleAvatar(
+                        maxRadius: 80.r,
+                        // radius: 50.r,
+                        minRadius: 60.r,
+                      ),
+                      SizedBox(
+                        height: 60.h,
+                      ),
+                      ListTile(
+                        leading: Icon(Icons.people),
+                        title: Text(user.name),
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.email),
+                        title: Text(user.email),
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.timeline_rounded),
+                        title: Text('History'),
+                        onTap: () {
+                          FluroRouting.fluroRouter.navigateTo(
+                              context, PageName.history,
+                              routeSettings: RouteSettings(
+                                  arguments:
+                                      FirebaseAuth.instance.currentUser!.uid));
+                        },
+                      ),
+                      Divider(),
+                      ListTile(
+                        leading: Icon(Icons.logout),
+                        title: Text("Log out"),
+                        onTap: () {
+                          _authBloc.add(LogOut());
+                        },
+                      ),
+                      Divider(),
+                      Spacer(),
+                      ListTile(
+                        title: Center(child: Text("version: 0.01")),
+                      )
+                    ],
+                  ),
+                );
+              }),
+        ),
+        appBar: AppBar(
+          // actions: [
+          //   IconButton(
+          //       onPressed: () {
+          //         _authBloc.add(LogOut());
+          //       },
+          //       icon: Icon(Icons.exit_to_app))
+          // ],
+          title: Text('All Attendance'),
+        ),
+        body: Container(
+            height: 1.sh,
+            width: 1.sw,
+            child: PaginateFirestore(
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2, childAspectRatio: 0.6),
+              itemBuilderType: PaginateBuilderType.gridView,
+              isLive: true,
+              shrinkWrap: true,
+              query: FirebaseFirestore.instance
+                  .collection('users')
+                  .doc(FirebaseAuth.instance.currentUser!.uid)
+                  .collection('subjects')
+                  .orderBy('timestamp'),
+              itemBuilder: (int, context, doc) {
+                SubjectModel subject = SubjectModel.fromFirestore(doc: doc);
+                return Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: _attendanceCard(
+                      absent: subject.absent!,
+                      present: subject.present!,
+                      subjectid: subject.subjectId!,
+                      subjectName: subject.subjectName!),
+                );
+              },
+            )));
+  }
+
+  Future<void> _popUp() async {
+    return await showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Center(
+              child: Text("Add Subject"),
+            ),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    FluroRouting.fluroRouter.pop(context);
+                  },
+                  child: Text('Cancle')),
+              TextButton(onPressed: _addSubject, child: Text('Ok'))
+            ],
+            content: Container(
+              child: TextFormField(
+                controller: _subjectName,
+                decoration: InputDecoration(hintText: 'subject'),
+                validator: (val) {
+                  return RegExp('[a-zA-Z]').hasMatch(val!)
+                      ? null
+                      : 'Wrong subject name';
+                },
+              ),
+            ),
+          );
+        });
+  }
+
+  Widget _attendanceCard({
+    required String subjectName,
+    required String subjectid,
+    required int absent,
+    required int present,
+  }) {
+    return Material(
+      color: Colors.grey[200],
+      borderRadius: BorderRadius.all(Radius.circular(20.r)),
+      child: Container(
+        padding: EdgeInsets.symmetric(horizontal: 10.h),
+        height: 0.8.sw,
+        child: Column(
+          children: [
+            ListTile(
+              title: Center(child: Text(subjectName)),
+              trailing: Icon(Icons.double_arrow_outlined),
+            ),
+            Text("Attendance"),
+            Text('$present/${present + absent}'),
+            CircleAvatar(
+              backgroundColor: Colors.lightBlue,
+              radius: 50.r,
+              child: Text(
+                '${(present / (present + absent) * 100).toStringAsFixed(1)}%',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+            Expanded(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(shape: StadiumBorder()),
+                    onPressed: () {
+                      _subjectBloc.add(IncrementPresent(subjectId: subjectid));
+                      _logBloc.add(LogIncrementEvent(
+                          isPresent: true, subjectName: subjectName));
+                    },
+                    child: Icon(
+                      Icons.add,
+                      size: 20,
+                    ),
+                  ),
+                  Text("- - -"),
+                  OutlinedButton(
+                    style: OutlinedButton.styleFrom(shape: StadiumBorder()),
+                    onPressed: () {
+                      if ((absent + present) != 0) {
+                        _subjectBloc.add(IncrementAbsent(subjectId: subjectid));
+                        _logBloc.add(LogIncrementEvent(
+                            isPresent: false, subjectName: subjectName));
+                      }
+                    },
+                    child: Icon(
+                      Icons.remove,
+                      size: 20,
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _addSubject() async {
+    _subjectBloc.add(InitalSubject(subjectName: _subjectName.text));
+    _logBloc.add(LogSubjectAdd(subjectName: _subjectName.text));
+    FluroRouting.fluroRouter.pop(context);
+  }
+}
