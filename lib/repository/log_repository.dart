@@ -35,7 +35,7 @@ class LogRepository {
     _logs.attendance = isPresent ? 'Present' : 'Absent';
     _logs.logId = docId.id;
     _logs.subjectName = subjectName;
-    _logs.timestamp = Timestamp.fromDate(DateTime.now());
+    _logs.timestamp = DateTime.now().millisecondsSinceEpoch;
     await docId.set(_logs.toFireStore(), SetOptions(merge: true));
   }
 
@@ -50,7 +50,7 @@ class LogRepository {
     _logs.attendance = subjectName;
     _logs.logId = docId.id;
     _logs.subjectName = subjectName;
-    _logs.timestamp = Timestamp.fromDate(DateTime.now());
+    _logs.timestamp = DateTime.now().millisecondsSinceEpoch;
     await docId.set(_logs.toFireStore(), SetOptions(merge: true));
   }
 

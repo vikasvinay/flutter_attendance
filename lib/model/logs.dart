@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 class Logs {
-  Timestamp? timestamp;
+  int? timestamp;
   String? subjectName;
   String? attendance;
   String? logId;
