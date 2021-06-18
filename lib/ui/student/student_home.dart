@@ -57,70 +57,69 @@ class _HomePageState extends State<HomePage> {
                 }
                 StudentModel user =
                     StudentModel.fromFireStore(doc: snapshot.data);
-                return SafeArea(
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 40.h,
-                      ),
-                      GestureDetector(
-                        onTap: () async {
-                          await _commonWidget.imagePicker(uid: user.uid);
-                        },
-                        child: CircleAvatar(
-                          maxRadius: 80.r,
-                          backgroundImage: NetworkImage(user.photoUrl!),
-                          minRadius: 60.r,
-                          child: Align(
-                            alignment: Alignment.bottomRight,
-                            child: Icon(
-                              Icons.edit,
-                              color: Colors.red,
-                            ),
+                return ListView(
+                  shrinkWrap: true,
+                  children: [
+                    SizedBox(
+                      height: 40.h,
+                    ),
+                    GestureDetector(
+                      onTap: () async {
+                        await _commonWidget.imagePicker(uid: user.uid);
+                      },
+                      child: CircleAvatar(
+                        maxRadius: 80.r,
+                        backgroundImage: NetworkImage(user.photoUrl!),
+                        minRadius: 60.r,
+                        child: Align(
+                          alignment: Alignment.bottomRight,
+                          child: Icon(
+                            Icons.edit,
+                            color: Colors.red,
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 60.h,
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.people),
-                        title: Text(user.name),
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.email),
-                        title: Text(user.email),
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.timeline_rounded),
-                        title: Text('History'),
-                        onTap: () {
-                          FluroRouting.fluroRouter.navigateTo(
-                              context, PageName.history,
-                              routeSettings: RouteSettings(arguments: [
-                                FirebaseAuth.instance.currentUser!.uid,
-                                user.totalAbsent,
-                                user.totalPresent
-                              ]));
-                        },
-                      ),
-                      Divider(),
-                      ListTile(
-                        leading: Icon(Icons.logout),
-                        title: Text("Log out"),
-                        onTap: () {
-                          _authBloc.add(LogOut());
-                        },
-                      ),
-                      Divider(),
-                      Spacer(),
-                      ListTile(
-                        title: Center(child: Text("version: 0.01")),
-                      )
-                    ],
-                  ),
+                    ),
+                    SizedBox(
+                      height: 60.h,
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.people),
+                      title: Text(user.name),
+                    ),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.email),
+                      title: Text(user.email),
+                    ),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.timeline_rounded),
+                      title: Text('History'),
+                      onTap: () {
+                        FluroRouting.fluroRouter.navigateTo(
+                            context, PageName.history,
+                            routeSettings: RouteSettings(arguments: [
+                              FirebaseAuth.instance.currentUser!.uid,
+                              user.totalAbsent,
+                              user.totalPresent
+                            ]));
+                      },
+                    ),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text("Log out"),
+                      onTap: () {
+                        _authBloc.add(LogOut());
+                      },
+                    ),
+                    Divider(),
+                    // Spacer(),
+                    ListTile(
+                      title: Center(child: Text("version: 0.01")),
+                    )
+                  ],
                 );
               }),
         ),

@@ -26,7 +26,7 @@ class MentorRepository {
     QuerySnapshot data = await firebaseFirestore
         .collection('users')
         .where('enrolled_subjects', arrayContainsAny: [mentorSubjects])
-        .orderBy('name', descending: true)
+        .orderBy('name', descending: true).where('type',isEqualTo: 'STUDENT')
         .get();
     data.docs.forEach((element) {
       if (firebaseAuth.currentUser!.uid != element.get('uid')) {

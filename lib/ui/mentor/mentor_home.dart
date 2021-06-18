@@ -91,7 +91,7 @@ class _MentorHomeState extends State<MentorHome> {
                     },
                   ),
                   Divider(),
-                  Spacer(),
+                  // Spacer(),
                   ListTile(
                     title: Center(child: Text("version: 0.01")),
                   )
@@ -112,7 +112,7 @@ class _MentorHomeState extends State<MentorHome> {
                     query: FirebaseFirestore.instance
                         .collection('users')
                         .where('enrolled_subjects',
-                            arrayContainsAny: _fetch.mentorModel.subjectName!)
+                            arrayContainsAny: _fetch.mentorModel.subjectName!).where('type', isEqualTo: 'STUDENT')
                         .orderBy('name', descending: true),
                     itemBuilder: (int, context, DocumentSnapshot doc) {
                       if (state.mentorModel.uid! != doc.get('uid')) {
@@ -132,6 +132,7 @@ class _MentorHomeState extends State<MentorHome> {
                                     ]));
                               },
                               child: studentCard(
+                                  photoUrl: student.photoUrl!,
                                   totalPresent: student.totalPresent,
                                   totalabsent: student.totalAbsent,
                                   mentorId: state.mentorModel.uid!,
@@ -167,6 +168,7 @@ class _MentorHomeState extends State<MentorHome> {
       required int totalPresent,
       required int totalabsent,
       required String mentorId,
+      required String photoUrl,
       required String studentId}) {
     if (studentId != mentorId) {
       List subjects = mentorSubjects
@@ -185,6 +187,7 @@ class _MentorHomeState extends State<MentorHome> {
             children: [
               CircleAvatar(
                 radius: 50.r,
+                backgroundImage: NetworkImage(photoUrl),
                 backgroundColor: Colors.lightBlue,
               ),
               Row(

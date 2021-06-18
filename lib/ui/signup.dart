@@ -99,7 +99,18 @@ class _RegisterPageState extends State<RegisterPage> {
               FluroRouting.fluroRouter.navigateTo(context, PageName.login);
             },
             child: Text("GO to login"),
-          )
+          ),
+          BlocBuilder(
+              bloc: _authBloc,
+              builder: (context, state) {
+                if (state is UserError) {
+                  _commonWidget.commonToast('Invalid Details or Email exist',
+                      color: Colors.red);
+                  return Container();
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
     );

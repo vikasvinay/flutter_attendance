@@ -41,7 +41,7 @@ class CommonWidget {
     );
   }
 
-  commonToast(String text, {Color? color}) async {
+  commonToast(String text, {Color? color}) {
     return Fluttertoast.showToast(
         msg: text,
         backgroundColor: color ?? Colors.blue,

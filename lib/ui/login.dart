@@ -103,7 +103,18 @@ class _LoginPageState extends State<LoginPage> {
               FluroRouting.fluroRouter.navigateTo(context, PageName.register);
             },
             child: Text("Register"),
-          )
+          ),
+          BlocBuilder(
+              bloc: _authBloc,
+              builder: (context, state) {
+                if (state is UserError) {
+                  _commonWidget.commonToast('Invalid Details',
+                      color: Colors.red);
+                  return Container();
+                } else {
+                  return Container();
+                }
+              })
         ],
       ),
     );
