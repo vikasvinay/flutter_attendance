@@ -1,21 +1,34 @@
-import 'dart:developer';
-
 import 'package:attendance_app/model/logs.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:flutter/material.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
+import 'package:pie_chart/pie_chart.dart';
 import 'package:timelines/timelines.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+// ignore: must_be_immutable
 class HistoryPage extends StatelessWidget {
   final String userId;
-  HistoryPage({Key? key, required this.userId}) : super(key: key);
+  final int totalPresent;
+  final int totalAbsent;
+  HistoryPage(
+      {Key? key,
+      required this.userId,
+      required this.totalAbsent,
+      required this.totalPresent})
+      : super(key: key);
   var nextTime;
   var editedTime;
   String? rawTime;
+
   @override
   Widget build(BuildContext context) {
+    Map<String, double> dataMap = {
+      'Present': totalPresent.toDouble(),
+      'Absent': totalAbsent.toDouble()
+    };
+    var colorList = <Color>[Colors.blue, Colors.red];
     return Scaffold(
       appBar: AppBar(
         title: Text('History'),
@@ -23,8 +36,93 @@ class HistoryPage extends StatelessWidget {
       body: ListView(
         shrinkWrap: true,
         children: [
-          SizedBox(
-            height: 0.4.sw,
+          Container(
+            height: 0.5.sw,
+            child: Row(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top:20),
+                  child: PieChart(
+                    dataMap: dataMap,
+                    animationDuration: Duration(milliseconds: 800),
+                    chartLegendSpacing: 32,
+                    chartRadius: 100.r,
+                    colorList: colorList,
+                    initialAngleInDegree: 0,
+                    chartType: ChartType.ring,
+                    ringStrokeWidth: 32,
+                    centerText:
+                        "${((totalPresent / (totalPresent + totalAbsent)) * 100).toStringAsFixed(1)}%",
+                    legendOptions: LegendOptions(
+                      showLegendsInRow: true,
+                      legendPosition: LegendPosition.bottom,
+                      showLegends: true,
+                      legendShape: BoxShape.circle,
+                      legendTextStyle: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    chartValuesOptions: ChartValuesOptions(
+                      showChartValueBackground: true,
+                      showChartValues: true,
+                      showChartValuesInPercentage: false,
+                      showChartValuesOutside: false,
+                      decimalPlaces: 1,
+                    ),
+                  ),
+                ),
+                Container(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Row(
+                        children: [
+                          Text(
+                            "Total Classes: ",
+                            style: TextStyle(
+                                fontSize: 25.sp, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '${totalPresent + totalAbsent}',
+                            style: TextStyle(
+                                fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Present: ",
+                            style: TextStyle(
+                                fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '$totalPresent',
+                            style: TextStyle(
+                                fontSize: 16.sp, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      Row(
+                        children: [
+                          Text(
+                            "Absent: ",
+                            style: TextStyle(
+                                fontSize: 18.sp, fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            '$totalAbsent',
+                            style: TextStyle(
+                                fontSize: 16.sp, fontWeight: FontWeight.bold),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 20.h,)
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
           Align(
             alignment: Alignment.centerLeft,

@@ -15,12 +15,15 @@ class LogBloc extends Bloc<LogEvent, LogState> {
       yield LogEmptyState();
     } else if (event is LogIncrementEvent) {
       await logRepository.createLog(
-          subjectName: event.subjectName, isPresent: event.isPresent);
+          subjectName: event.subjectName,
+          isPresent: event.isPresent,
+          studentUid: event.studentUid,
+          timestamp: event.timestamp);
       yield LogIncrementState();
     } else if (event is GetAllLogs) {
       logRepository.getAllLogs(useruid: event.userId);
       yield GotLogs();
-    }else if(event is LogSubjectAdd){
+    } else if (event is LogSubjectAdd) {
       await logRepository.logSubjectAdd(subjectName: event.subjectName);
       yield Loginitial();
     }

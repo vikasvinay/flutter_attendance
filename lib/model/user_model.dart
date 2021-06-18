@@ -1,12 +1,13 @@
-import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class UsersModel {
+class UserModel {
   String name;
   String uid;
   String email;
   String type;
 
-  UsersModel(
+
+  UserModel(
       {required this.email,
       required this.name,
       required this.type,
@@ -21,11 +22,11 @@ class UsersModel {
     return map;
   }
 
-  factory UsersModel.fromFireStore({required AsyncSnapshot doc}) {
-    return UsersModel(
-        email: doc.requireData['email'],
-        name: doc.requireData['name'],
-        type: doc.requireData['type'],
-        uid: doc.requireData['uid']);
+  factory UserModel.fromFireStore({required DocumentSnapshot doc}) {
+    return UserModel(
+        email: doc.get('email'),
+        name: doc.get('name'),
+        type: doc.get('type'),
+        uid: doc.get('uid'));
   }
 }

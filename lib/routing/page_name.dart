@@ -1,3 +1,4 @@
+
 class PageName{
   static const login = 'login/';
   static const register = 'register/';
@@ -5,4 +6,5 @@ class PageName{
   static const history = 'home/history/';
   static const mentorHome = 'mentor-home/';
   static const superAdminHome = 'super_admin-home/';
+  static const addAttendance = 'mentor/add-attendance';
 }

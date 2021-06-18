@@ -3,9 +3,11 @@ import 'dart:developer';
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
+import 'package:attendance_app/bloc/mentor/mentor_bloc.dart';
 import 'package:attendance_app/model/user_model.dart';
 import 'package:attendance_app/repository/auth_repository.dart';
 import 'package:attendance_app/repository/log_repository.dart';
+import 'package:attendance_app/repository/mentor_repository.dart';
 import 'package:attendance_app/repository/subject_repository.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/ui/mentor/mentor_home.dart';
@@ -32,6 +34,9 @@ void main() async {
     BlocProvider<LogBloc>(
       create: (context) =>
           LogBloc(logRepository: LogRepository())..add(LogEmptyEvent()),
+    ),
+    BlocProvider<MentorBloc>(
+      create: (context) => MentorBloc(MentorRepository())..add(FetchMentor()),
     )
   ], child: Core()));
 }
@@ -49,7 +54,6 @@ class _CoreState extends State<Core> {
   void initState() {
     FluroRouting().routeSetup();
     _authBloc = BlocProvider.of<AuthBloc>(context);
-    // log(FirebaseAuth.instance.currentUser!.uid);
     super.initState();
   }
 
@@ -74,7 +78,8 @@ class _CoreState extends State<Core> {
                         child: CircularProgressIndicator(),
                       );
                     } else {
-                      UsersModel user = UsersModel.fromFireStore(doc: snap);
+                      UserModel user = UserModel.fromFireStore(
+                          doc: snap.data as DocumentSnapshot);
                       log('UID: ${FirebaseAuth.instance.currentUser!.uid}');
 
                       log('LOGIN TYPE: ${user.type}');

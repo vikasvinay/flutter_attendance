@@ -28,14 +28,23 @@ class SubJectRepository {
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .collection('subjects')
-        .doc();
+        .doc(subjectName.toLowerCase().trim());
     _subjectModel.absent = 0;
     _subjectModel.present = 0;
-    _subjectModel.subjectName = subjectName;
+    _subjectModel.subjectName = subjectName.toLowerCase().trim();
     _subjectModel.timestamp = Timestamp.fromDate(DateTime.now());
-    _subjectModel.subjectId = docId.id;
+    _subjectModel.subjectId = subjectName.toLowerCase().trim();
 
     await docId.set(_subjectModel.toFirestore(), SetOptions(merge: true));
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .set({
+      'total_absent': FieldValue.increment(0),
+      'total_present': FieldValue.increment(0),
+      'enrolled_subjects':
+          FieldValue.arrayUnion([subjectName.toLowerCase().trim()])
+    }, SetOptions(merge: true));
   }
 
   Future<void> editSubject(
@@ -47,13 +56,22 @@ class SubJectRepository {
   }
 
   Future<void> addAttendance(
-      {required bool isPresent, required String subjectId}) async {
+      {required bool isPresent,
+      required String subjectId,
+      required String studentUid}) async {
     String type = isPresent ? 'present' : 'absent';
+    String mainType = isPresent ? 'total_present' : 'total_absent';
     await firebaseFirestore
         .collection('users')
-        .doc(firebaseAuth.currentUser!.uid)
+        .doc(studentUid)
         .collection('subjects')
         .doc(subjectId)
         .update({type: FieldValue.increment(1)});
+    await firebaseFirestore
+        .collection('users')
+        .doc(studentUid)
+        .update({
+      mainType: FieldValue.increment(1),
+    },);
   }
 }

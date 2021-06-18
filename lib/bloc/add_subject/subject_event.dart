@@ -9,10 +9,10 @@ abstract class SubjectEvent extends Equatable {
   factory SubjectEvent.addSubject(
           String subjectId, SubjectModel subjectModel) =>
       EditSubject(subjectId: subjectId, subjectModel: subjectModel);
-  factory SubjectEvent.present(bool isPresent, String subjectId) =>
-      IncrementPresent(subjectId: subjectId);
-  factory SubjectEvent.absent(bool isPresent, String subjectId) =>
-      IncrementAbsent(subjectId: subjectId);
+  factory SubjectEvent.present(bool isPresent, String subjectId, String studentUid) =>
+      IncrementPresent(subjectId: subjectId, studentUid:studentUid);
+  factory SubjectEvent.absent(String studentUid, String subjectId) =>
+      IncrementAbsent(subjectId: subjectId, studentUid: studentUid);
 }
 
 class EmptyEvent extends SubjectEvent {
@@ -38,19 +38,21 @@ class InitalSubject extends SubjectEvent {
 }
 
 class IncrementPresent extends SubjectEvent {
+  final String studentUid;
   final String subjectId;
 
-  IncrementPresent({required this.subjectId});
+  IncrementPresent({required this.subjectId,required this.studentUid});
 
   @override
-  List<Object> get props => [subjectId];
+  List<String> get props => [subjectId, studentUid];
 }
 
 class IncrementAbsent extends SubjectEvent {
+  final String studentUid;
   final String subjectId;
 
-  IncrementAbsent({required this.subjectId});
+  IncrementAbsent({required this.subjectId, required this.studentUid});
 
   @override
-  List<Object> get props => [subjectId];
+  List<String> get props => [subjectId, studentUid];
 }

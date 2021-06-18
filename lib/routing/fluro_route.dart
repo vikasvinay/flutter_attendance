@@ -1,5 +1,6 @@
 import 'package:attendance_app/routing/page_name.dart';
 import 'package:attendance_app/ui/common/history.dart';
+import 'package:attendance_app/ui/mentor/add_attendance.dart';
 import 'package:attendance_app/ui/mentor/mentor_home.dart';
 import 'package:attendance_app/ui/student/student_home.dart';
 import 'package:attendance_app/ui/login.dart';
@@ -15,13 +16,20 @@ class FluroRouting {
   Handler _register = Handler(handlerFunc: (context, params) => RegisterPage());
   Handler _studentHome = Handler(handlerFunc: (context, params) => HomePage());
   Handler _history = Handler(handlerFunc: (context, params) {
-    final String data = ModalRoute.of(context!)!.settings.arguments as String;
+    final List data = ModalRoute.of(context!)!.settings.arguments as List;
     return HistoryPage(
-      userId: data,
+      totalAbsent: data[1],
+      totalPresent: data[2],
+      userId: data[0],
     );
   });
   Handler _mentorHome = Handler(handlerFunc: (context, params) => MentorHome());
   Handler _adminHome = Handler(handlerFunc: (context, params) => Superhome());
+  Handler _addAttendance = Handler(handlerFunc: (context, params) {
+    final List subjectsList =
+        ModalRoute.of(context!)!.settings.arguments as List;
+    return AddAttendance(subjectsList: subjectsList);
+  });
 
   void routeSetup() {
     fluroRouter.define(PageName.login, handler: _login);
@@ -30,5 +38,6 @@ class FluroRouting {
     fluroRouter.define(PageName.history, handler: _history);
     fluroRouter.define(PageName.mentorHome, handler: _mentorHome);
     fluroRouter.define(PageName.superAdminHome, handler: _adminHome);
+    fluroRouter.define(PageName.addAttendance, handler: _addAttendance);
   }
 }

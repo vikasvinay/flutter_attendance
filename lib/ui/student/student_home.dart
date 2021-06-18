@@ -2,9 +2,10 @@ import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/model/subject_model.dart';
-import 'package:attendance_app/model/user_model.dart';
+import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
+import 'package:attendance_app/ui/common/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -24,6 +25,7 @@ class _HomePageState extends State<HomePage> {
   late SubjectBloc _subjectBloc;
   late LogBloc _logBloc;
   TextEditingController _subjectName = TextEditingController();
+  CommonWidget _commonWidget = CommonWidget();
   @override
   void initState() {
     _authBloc = BlocProvider.of<AuthBloc>(context);
@@ -42,28 +44,41 @@ class _HomePageState extends State<HomePage> {
           icon: Icon(Icons.add),
         ),
         drawer: Drawer(
-          child: FutureBuilder(
-              future: FirebaseFirestore.instance
+          child: StreamBuilder(
+              stream: FirebaseFirestore.instance
                   .collection('users')
                   .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .get(),
-              builder: (context, snapshot) {
+                  .snapshots(),
+              builder: (context, AsyncSnapshot snapshot) {
                 if (!snapshot.hasData) {
                   return Center(
                     child: CircularProgressIndicator(),
                   );
                 }
-                UsersModel user = UsersModel.fromFireStore(doc: snapshot);
+                StudentModel user =
+                    StudentModel.fromFireStore(doc: snapshot.data);
                 return SafeArea(
                   child: Column(
                     children: [
                       SizedBox(
                         height: 40.h,
                       ),
-                      CircleAvatar(
-                        maxRadius: 80.r,
-                        // radius: 50.r,
-                        minRadius: 60.r,
+                      GestureDetector(
+                        onTap: () async {
+                          await _commonWidget.imagePicker(uid: user.uid);
+                        },
+                        child: CircleAvatar(
+                          maxRadius: 80.r,
+                          backgroundImage: NetworkImage(user.photoUrl!),
+                          minRadius: 60.r,
+                          child: Align(
+                            alignment: Alignment.bottomRight,
+                            child: Icon(
+                              Icons.edit,
+                              color: Colors.red,
+                            ),
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 60.h,
@@ -84,9 +99,11 @@ class _HomePageState extends State<HomePage> {
                         onTap: () {
                           FluroRouting.fluroRouter.navigateTo(
                               context, PageName.history,
-                              routeSettings: RouteSettings(
-                                  arguments:
-                                      FirebaseAuth.instance.currentUser!.uid));
+                              routeSettings: RouteSettings(arguments: [
+                                FirebaseAuth.instance.currentUser!.uid,
+                                user.totalAbsent,
+                                user.totalPresent
+                              ]));
                         },
                       ),
                       Divider(),
@@ -108,13 +125,6 @@ class _HomePageState extends State<HomePage> {
               }),
         ),
         appBar: AppBar(
-          // actions: [
-          //   IconButton(
-          //       onPressed: () {
-          //         _authBloc.add(LogOut());
-          //       },
-          //       icon: Icon(Icons.exit_to_app))
-          // ],
           title: Text('All Attendance'),
         ),
         body: Container(
@@ -122,7 +132,7 @@ class _HomePageState extends State<HomePage> {
             width: 1.sw,
             child: PaginateFirestore(
               gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2, childAspectRatio: 0.6),
+                  crossAxisCount: 2, childAspectRatio: 0.8),
               itemBuilderType: PaginateBuilderType.gridView,
               isLive: true,
               shrinkWrap: true,
@@ -189,9 +199,10 @@ class _HomePageState extends State<HomePage> {
         padding: EdgeInsets.symmetric(horizontal: 10.h),
         height: 0.8.sw,
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             ListTile(
-              title: Center(child: Text(subjectName)),
+              title: Center(child: Text(subjectName.toUpperCase())),
               trailing: Icon(Icons.double_arrow_outlined),
             ),
             Text("Attendance"),
@@ -204,40 +215,40 @@ class _HomePageState extends State<HomePage> {
                 style: TextStyle(color: Colors.white),
               ),
             ),
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(shape: StadiumBorder()),
-                    onPressed: () {
-                      _subjectBloc.add(IncrementPresent(subjectId: subjectid));
-                      _logBloc.add(LogIncrementEvent(
-                          isPresent: true, subjectName: subjectName));
-                    },
-                    child: Icon(
-                      Icons.add,
-                      size: 20,
-                    ),
-                  ),
-                  Text("- - -"),
-                  OutlinedButton(
-                    style: OutlinedButton.styleFrom(shape: StadiumBorder()),
-                    onPressed: () {
-                      if ((absent + present) != 0) {
-                        _subjectBloc.add(IncrementAbsent(subjectId: subjectid));
-                        _logBloc.add(LogIncrementEvent(
-                            isPresent: false, subjectName: subjectName));
-                      }
-                    },
-                    child: Icon(
-                      Icons.remove,
-                      size: 20,
-                    ),
-                  ),
-                ],
-              ),
-            )
+            // Expanded(
+            //   child: Row(
+            //     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            //     children: [
+            //       OutlinedButton(
+            //         style: OutlinedButton.styleFrom(shape: StadiumBorder()),
+            //         onPressed: () {
+            //           _subjectBloc.add(IncrementPresent(subjectId: subjectid));
+            //           _logBloc.add(LogIncrementEvent(
+            //               isPresent: true, subjectName: subjectName));
+            //         },
+            //         child: Icon(
+            //           Icons.add,
+            //           size: 20,
+            //         ),
+            //       ),
+            //       Text("- - -"),
+            //       OutlinedButton(
+            //         style: OutlinedButton.styleFrom(shape: StadiumBorder()),
+            //         onPressed: () {
+            //           if ((absent + present) != 0) {
+            //             _subjectBloc.add(IncrementAbsent(subjectId: subjectid));
+            //             _logBloc.add(LogIncrementEvent(
+            //                 isPresent: false, subjectName: subjectName));
+            //           }
+            //         },
+            //         child: Icon(
+            //           Icons.remove,
+            //           size: 20,
+            //         ),
+            //       ),
+            //     ],
+            //   ),
+            // )
           ],
         ),
       ),

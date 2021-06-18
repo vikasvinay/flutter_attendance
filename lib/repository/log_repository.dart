@@ -25,17 +25,17 @@ class LogRepository {
   }
 
   Future<void> createLog(
-      {required String subjectName, required bool isPresent}) async {
+      {required String subjectName, required bool isPresent , required int timestamp, required String studentUid}) async {
     DocumentReference<Map<String, dynamic>> docId = firebaseFirestore
         .collection('users')
-        .doc(firebaseAuth.currentUser!.uid)
+        .doc(studentUid)
         .collection('logs')
         .doc();
 
     _logs.attendance = isPresent ? 'Present' : 'Absent';
     _logs.logId = docId.id;
     _logs.subjectName = subjectName;
-    _logs.timestamp = DateTime.now().millisecondsSinceEpoch;
+    _logs.timestamp = timestamp;
     await docId.set(_logs.toFireStore(), SetOptions(merge: true));
   }
 
