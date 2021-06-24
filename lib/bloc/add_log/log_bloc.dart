@@ -26,6 +26,9 @@ class LogBloc extends Bloc<LogEvent, LogState> {
     } else if (event is LogSubjectAdd) {
       await logRepository.logSubjectAdd(subjectName: event.subjectName);
       yield Loginitial();
+    } else if (event is DeleteLogs) {
+      await logRepository.deleteLogs(userId: event.userId);
+      yield LogsDeleted();
     }
   }
 }

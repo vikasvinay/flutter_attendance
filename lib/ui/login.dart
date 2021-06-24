@@ -132,17 +132,19 @@ class _LoginPageState extends State<LoginPage> {
                 "Not a user? Register here.",
                 style: TextStyle(color: Colors.grey, fontSize: 16.sp),
               )),
-          BlocBuilder(
-              bloc: _authBloc,
-              builder: (context, state) {
+
+          BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
                 if (state is UserError) {
+                  print('in if');
+
                   _commonWidget.commonToast('Invalid Details',
                       color: Colors.red);
-                  return Container();
                 } else {
-                  return Container();
+                  print('in else');
                 }
-              })
+              },
+              child: Container())
         ],
       ),
     );

@@ -1,9 +1,11 @@
+import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/model/logs.dart';
 import 'package:attendance_app/ui/common/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:pie_chart/pie_chart.dart';
 import 'package:timelines/timelines.dart';
@@ -24,7 +26,7 @@ class HistoryPage extends StatelessWidget {
   var editedTime;
   String? rawTime;
   final CommonWidget _commonWidget = CommonWidget();
-  final int pageIndex =0;
+  final int pageIndex = 0;
   @override
   Widget build(BuildContext context) {
     Map<String, double> dataMap = {
@@ -35,8 +37,19 @@ class HistoryPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text('History'),
+        actions: userId == FirebaseAuth.instance.currentUser!.uid
+            ? [
+                IconButton(
+                    onPressed: () {
+                      _deleteLogs(context);
+                    },
+                    icon: Icon(Icons.delete))
+              ]
+            : null,
       ),
-      bottomNavigationBar: userId == FirebaseAuth.instance.currentUser!.uid ? _commonWidget.bottomNavBar(context:context, pageIndex:pageIndex): null,
+      bottomNavigationBar: userId == FirebaseAuth.instance.currentUser!.uid
+          ? _commonWidget.bottomNavBar(context: context, pageIndex: pageIndex)
+          : null,
       body: ListView(
         shrinkWrap: true,
         children: [
@@ -45,7 +58,7 @@ class HistoryPage extends StatelessWidget {
             child: Row(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top:20),
+                  padding: const EdgeInsets.only(top: 20),
                   child: PieChart(
                     dataMap: dataMap,
                     animationDuration: Duration(milliseconds: 800),
@@ -121,7 +134,9 @@ class HistoryPage extends StatelessWidget {
                           )
                         ],
                       ),
-                      SizedBox(height: 20.h,)
+                      SizedBox(
+                        height: 20.h,
+                      )
                     ],
                   ),
                 )
@@ -202,5 +217,10 @@ class HistoryPage extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  _deleteLogs(BuildContext context) {
+    BlocProvider.of<LogBloc>(context)
+        .add(LogEvent.deleteLogs(FirebaseAuth.instance.currentUser!.uid));
   }
 }

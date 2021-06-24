@@ -1,6 +1,6 @@
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
-import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
+import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/model/subject_model.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
@@ -13,6 +13,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 import '../../ui/common/global.dart' as global;
+
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -21,7 +22,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AuthBloc _authBloc;
+  // late AuthBloc _authBloc;
   late SubjectBloc _subjectBloc;
   late LogBloc _logBloc;
   TextEditingController _subjectName = TextEditingController();
@@ -29,10 +30,10 @@ class _HomePageState extends State<HomePage> {
   final int pageIndex = 1;
   @override
   void initState() {
-    _authBloc = BlocProvider.of<AuthBloc>(context);
+    // _authBloc = BlocProvider.of<AuthBloc>(context);
     _subjectBloc = BlocProvider.of<SubjectBloc>(context);
     _logBloc = BlocProvider.of<LogBloc>(context);
-    
+
     super.initState();
   }
 
@@ -58,99 +59,20 @@ class _HomePageState extends State<HomePage> {
               }
               StudentModel user =
                   StudentModel.fromFireStore(doc: snapshot.data);
-                  global.totalAbsent = user.totalAbsent;
-                  global.totalPresent = user.totalPresent;
-                  global.uid = FirebaseAuth.instance.currentUser!.uid;
-                  print(global.totalPresent);
+              global.totalAbsent = user.totalAbsent;
+              global.totalPresent = user.totalPresent;
+              global.uid = FirebaseAuth.instance.currentUser!.uid;
+              print(global.totalPresent);
               return _commonWidget.bottomNavBar(
-                  context: context,
-                  pageIndex: pageIndex,
-                  // totalAbsent: user.totalAbsent,
-                  // totalPresent: user.totalPresent, uid: FirebaseAuth.instance.currentUser!.uid,
-                  );
+                context: context,
+                pageIndex: pageIndex,
+              );
             }),
-        drawer: Drawer(
-          child: StreamBuilder(
-              stream: FirebaseFirestore.instance
-                  .collection('users')
-                  .doc(FirebaseAuth.instance.currentUser!.uid)
-                  .snapshots(),
-              builder: (context, AsyncSnapshot snapshot) {
-                if (!snapshot.hasData) {
-                  return Center(
-                    child: CircularProgressIndicator(),
-                  );
-                }
-                StudentModel user =
-                    StudentModel.fromFireStore(doc: snapshot.data);
-                return ListView(
-                  shrinkWrap: true,
-                  children: [
-                    SizedBox(
-                      height: 40.h,
-                    ),
-                    GestureDetector(
-                      onTap: () async {
-                        await _commonWidget.imagePicker(uid: user.uid);
-                      },
-                      child: CircleAvatar(
-                        maxRadius: 80.r,
-                        backgroundImage: NetworkImage(user.photoUrl!),
-                        minRadius: 60.r,
-                        child: Align(
-                          alignment: Alignment.bottomRight,
-                          child: Icon(
-                            Icons.edit,
-                            color: Colors.red,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 60.h,
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.people),
-                      title: Text(user.name),
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.email),
-                      title: Text(user.email),
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.timeline_rounded),
-                      title: Text('History'),
-                      onTap: () {
-                        FluroRouting.fluroRouter.navigateTo(
-                            context, PageName.history,
-                            routeSettings: RouteSettings(arguments: [
-                              FirebaseAuth.instance.currentUser!.uid,
-                              user.totalAbsent,
-                              user.totalPresent
-                            ]));
-                      },
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.logout),
-                      title: Text("Log out"),
-                      onTap: () {
-                        _authBloc.add(LogOut());
-                      },
-                    ),
-                    Divider(),
-                    // Spacer(),
-                    ListTile(
-                      title: Center(child: Text("version: 0.01")),
-                    )
-                  ],
-                );
-              }),
-        ),
+        // drawer: StudentDrawer(commonWidget: _commonWidget, authBloc: _authBloc),
+
         appBar: AppBar(
-          title: Text('All Attendance'),
+          centerTitle: true,
+          title: Text('All Subjects'),
         ),
         body: Container(
             height: 1.sh,
@@ -217,19 +139,43 @@ class _HomePageState extends State<HomePage> {
     required int absent,
     required int present,
   }) {
+    void _deleteSubject() {
+    _subjectBloc
+        .add(SubjectEvent.deletSubject(subjectName.trim().toLowerCase()));
+    _commonWidget.commonToast(
+        'You have deleted ${subjectName.toUpperCase().trim()}');
+    _logBloc.add(LogEvent.addSubject(
+        '${subjectName.toUpperCase().trim()}\nDeleted'));
+  }
     return Material(
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.all(Radius.circular(20.r)),
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 10.h),
+        padding: EdgeInsets.only(left: 10.h),
         height: 0.8.sw,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
-            ListTile(
-              title: Center(child: Text(subjectName.toUpperCase())),
-              // trailing: Icon(Icons.double_arrow_outlined),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Text(
+                  subjectName.toUpperCase(),
+                  style: Theme.of(context).textTheme.subtitle1!..fontSize,
+                ),
+                Spacer(),
+                IconButton(
+                    onPressed: _deleteSubject,
+                    icon: Icon(
+                      Icons.delete,
+                      size: 18,
+                    ))
+              ],
             ),
+            // ListTile(
+            //   title: Center(child: Text(subjectName.toUpperCase())),
+            //   trailing: IconButton(onPressed: _deleteSubject, icon: Icon(Icons.delete, size: 15,)),
+            // ),
             Text("Attendance"),
             Text('$present/${present + absent}'),
             CircleAvatar(
@@ -278,11 +224,110 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+    
   }
 
   Future<void> _addSubject() async {
     _subjectBloc.add(InitalSubject(subjectName: _subjectName.text));
     _logBloc.add(LogSubjectAdd(subjectName: _subjectName.text));
     FluroRouting.fluroRouter.pop(context);
+  }
+
+  
+}
+
+class StudentDrawer extends StatelessWidget {
+  const StudentDrawer({
+    Key? key,
+    required CommonWidget commonWidget,
+    required AuthBloc authBloc,
+  })  : _commonWidget = commonWidget,
+        _authBloc = authBloc,
+        super(key: key);
+
+  final CommonWidget _commonWidget;
+  final AuthBloc _authBloc;
+
+  @override
+  Widget build(BuildContext context) {
+    return Drawer(
+      child: StreamBuilder(
+          stream: FirebaseFirestore.instance
+              .collection('users')
+              .doc(FirebaseAuth.instance.currentUser!.uid)
+              .snapshots(),
+          builder: (context, AsyncSnapshot snapshot) {
+            if (!snapshot.hasData) {
+              return Center(
+                child: CircularProgressIndicator(),
+              );
+            }
+            StudentModel user = StudentModel.fromFireStore(doc: snapshot.data);
+            return ListView(
+              shrinkWrap: true,
+              children: [
+                SizedBox(
+                  height: 40.h,
+                ),
+                GestureDetector(
+                  onTap: () async {
+                    await _commonWidget.imagePicker(uid: user.uid);
+                  },
+                  child: CircleAvatar(
+                    maxRadius: 80.r,
+                    backgroundImage: NetworkImage(user.photoUrl!),
+                    minRadius: 60.r,
+                    child: Align(
+                      alignment: Alignment.bottomRight,
+                      child: Icon(
+                        Icons.edit,
+                        color: Colors.red,
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 60.h,
+                ),
+                ListTile(
+                  leading: Icon(Icons.people),
+                  title: Text(user.name),
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.email),
+                  title: Text(user.email),
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.timeline_rounded),
+                  title: Text('History'),
+                  onTap: () {
+                    FluroRouting.fluroRouter.navigateTo(
+                        context, PageName.history,
+                        routeSettings: RouteSettings(arguments: [
+                          FirebaseAuth.instance.currentUser!.uid,
+                          user.totalAbsent,
+                          user.totalPresent
+                        ]));
+                  },
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.logout),
+                  title: Text("Log out"),
+                  onTap: () {
+                    _authBloc.add(LogOut());
+                  },
+                ),
+                Divider(),
+                // Spacer(),
+                ListTile(
+                  title: Center(child: Text("version: 0.01")),
+                )
+              ],
+            );
+          }),
+    );
   }
 }

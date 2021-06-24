@@ -55,6 +55,23 @@ class SubJectRepository {
         .set(subjectModel.toFirestore(), SetOptions(merge: true));
   }
 
+  Future<void> deleteSubject({required String subjectName}) async {
+    firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .collection('subjects')
+        .doc(subjectName)
+        .delete();
+
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .set({
+      'enrolled_subjects': FieldValue.arrayRemove(
+          [subjectName]) //([subjectName.toLowerCase().trim()])
+    }, SetOptions(merge: true));
+  }
+
   Future<void> addAttendance(
       {required bool isPresent,
       required String subjectId,
@@ -67,11 +84,10 @@ class SubJectRepository {
         .collection('subjects')
         .doc(subjectId)
         .update({type: FieldValue.increment(1)});
-    await firebaseFirestore
-        .collection('users')
-        .doc(studentUid)
-        .update({
-      mainType: FieldValue.increment(1),
-    },);
+    await firebaseFirestore.collection('users').doc(studentUid).update(
+      {
+        mainType: FieldValue.increment(1),
+      },
+    );
   }
 }

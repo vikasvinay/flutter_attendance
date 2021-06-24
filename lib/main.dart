@@ -1,9 +1,9 @@
 import 'dart:developer';
 
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
-import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/bloc/mentor/mentor_bloc.dart';
+import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/theme/theme_bloc.dart';
 import 'package:attendance_app/model/user_model.dart';
 import 'package:attendance_app/repository/auth_repository.dart';
@@ -27,7 +27,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   return runApp(MultiBlocProvider(providers: [
-    BlocProvider<ThemeBloc> (create: (context)=> ThemeBloc(),),
+    BlocProvider<ThemeBloc>(
+      create: (context) => ThemeBloc(),
+    ),
     BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(AuthRepository())..add(AppLaunched())),
     BlocProvider<SubjectBloc>(
@@ -37,7 +39,6 @@ void main() async {
       create: (context) =>
           LogBloc(logRepository: LogRepository())..add(LogEmptyEvent()),
     ),
-    
     BlocProvider<MentorBloc>(
       create: (context) => MentorBloc(MentorRepository())..add(FetchMentor()),
     )
@@ -65,12 +66,60 @@ class _CoreState extends State<Core> {
   @override
   Widget build(BuildContext context) {
     return ScreenUtilInit(builder: () {
-      return BlocBuilder<ThemeBloc, ThemeState>(
+      return BlocBuilder<AuthBloc, AuthState>(builder: (context, authState) {
+        if (authState is LoggedIn) {
+          return BlocBuilder<ThemeBloc, ThemeState>(
+              builder: (context, themeState) {
+            return MaterialApp(
+              theme: themeState.appTheme,
+              debugShowCheckedModeBanner: false,
+              onGenerateRoute: FluroRouting.fluroRouter.generator,
+              home: FutureBuilder(
+                  future: FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .get(),
+                  builder: (context, snap) {
+                    if (!snap.hasData) {
+                      return Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    } else {
+                      UserModel user = UserModel.fromFireStore(
+                          doc: snap.data as DocumentSnapshot);
+                      log('UID: ${FirebaseAuth.instance.currentUser!.uid}');
+
+                      log('LOGIN TYPE: ${user.type}');
+                      if (user.type == 'STUDENT') {
+                        return HomePage();
+                      } else if (user.type == 'MENTOR') {
+                        return MentorHome();
+                      } else if (user.type == 'ADMIN') {
+                        return Superhome();
+                      } else {
+                        _authBloc.add(LogOut());
+                        return LoginPage();
+                      }
+                    }
+                  }),
+            );
+          });
+        } else {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            onGenerateRoute: FluroRouting.fluroRouter.generator,
+            home: LoginPage(),
+          );
+          
+        }
+      });
+
+      BlocBuilder<ThemeBloc, ThemeState>(
         // bloc: _themeBloc,
         builder: (context, themeState) {
           print(themeState);
           print('`````````````````````````');
-          ThemeData theme  = themeState.appTheme ;
+          ThemeData theme = themeState.appTheme;
           return MaterialApp(
             theme: theme,
             debugShowCheckedModeBanner: false,

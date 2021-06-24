@@ -136,6 +136,8 @@ class _SettingsState extends State<Settings> {
                   title: Text("Log out"),
                   onTap: () {
                     _authBloc.add(LogOut());
+                    _themeBloc.add(
+                              ChangeThemeEvent(appTheme: AppTheme.values[0]));
                   },
                 ),
                 Divider(),

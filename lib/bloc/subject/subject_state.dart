@@ -7,6 +7,7 @@ abstract class SubjectState {
   factory SubjectState.changeState() => ChangedSubjectAttendance();
   factory SubjectState.initialState() => SubjectInitalState();
   factory SubjectState.editedState() => SubjectEdited();
+  factory SubjectState.deleteSubject() => SubjectDeleted();
 }
 
 class EmptyState extends SubjectState {}
@@ -17,3 +18,4 @@ class SubjectInitalState extends SubjectState {}
 
 class SubjectEdited extends SubjectState {}
 
+class SubjectDeleted extends SubjectState {}

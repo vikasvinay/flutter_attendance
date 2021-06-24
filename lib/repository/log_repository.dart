@@ -25,7 +25,10 @@ class LogRepository {
   }
 
   Future<void> createLog(
-      {required String subjectName, required bool isPresent , required int timestamp, required String studentUid}) async {
+      {required String subjectName,
+      required bool isPresent,
+      required int timestamp,
+      required String studentUid}) async {
     DocumentReference<Map<String, dynamic>> docId = firebaseFirestore
         .collection('users')
         .doc(studentUid)
@@ -39,8 +42,7 @@ class LogRepository {
     await docId.set(_logs.toFireStore(), SetOptions(merge: true));
   }
 
-  Future<void> logSubjectAdd(
-      {required String subjectName}) async {
+  Future<void> logSubjectAdd({required String subjectName}) async {
     DocumentReference<Map<String, dynamic>> docId = firebaseFirestore
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
@@ -54,4 +56,16 @@ class LogRepository {
     await docId.set(_logs.toFireStore(), SetOptions(merge: true));
   }
 
+  Future<void> deleteLogs({required String userId}) async {
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .collection('logs')
+        .get()
+        .then((snapshot) async {
+      for (DocumentSnapshot ds in snapshot.docs) {
+        await ds.reference.delete();
+      }
+    });
+  }
 }

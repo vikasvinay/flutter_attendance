@@ -14,6 +14,8 @@ abstract class LogEvent extends Equatable {
   factory LogEvent.addSubject(String subjectName) =>
       LogSubjectAdd(subjectName: subjectName);
 
+      factory LogEvent.deleteLogs(String userId) => DeleteLogs(userId: userId);
+
   @override
   List<Object> get props => [];
 }
@@ -27,7 +29,7 @@ class LogSubjectAdd extends LogEvent {
   final String subjectName;
   LogSubjectAdd({required this.subjectName});
   @override
-  List<Object> get props => [];
+  List<String> get props => [];
 }
 
 class LogIncrementEvent extends LogEvent {
@@ -49,5 +51,12 @@ class GetAllLogs extends LogEvent {
   final String userId;
   GetAllLogs({required this.userId});
   @override
-  List<Object> get props => [userId];
+  List<String> get props => [userId];
+}
+
+class DeleteLogs extends LogEvent {
+  final String userId;
+  DeleteLogs({required this.userId});
+  @override
+  List<String> get props => [userId];
 }

@@ -135,17 +135,19 @@ class _RegisterPageState extends State<RegisterPage> {
                 "I'm a user!",
                 style: TextStyle(color: Colors.grey, fontSize: 16.sp),
               )),
-          BlocBuilder(
-              bloc: _authBloc,
-              builder: (context, state) {
+          BlocListener<AuthBloc, AuthState>(
+              listener: (context, state) {
                 if (state is UserError) {
-                  _commonWidget.commonToast('Invalid Details or Email not exist',
+                  print('in if');
+
+                  _commonWidget.commonToast(
+                      'Invalid Details or Email not exist',
                       color: Colors.red);
-                  return Container();
                 } else {
-                  return Container();
+                  print('in else');
                 }
-              })
+              },
+              child: Container())
         ],
       ),
     );

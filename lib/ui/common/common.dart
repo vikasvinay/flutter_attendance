@@ -84,22 +84,37 @@ class CommonWidget {
         BottomNavigationBarItem(
           activeIcon: Icon(
             Icons.book,
+            color: Theme.of(context).iconTheme.color,
             size: 50.r,
           ),
-          icon: Icon(Icons.book),
+          icon: Icon(
+            Icons.book,
+            color: Theme.of(context).iconTheme.color,
+          ),
           label: 'Attendance',
         ),
         BottomNavigationBarItem(
-          activeIcon: Icon(Icons.home, size: 50.r),
-          icon: Icon(Icons.home),
+          activeIcon: Icon(
+            Icons.home,
+            size: 50.r,
+            color: Theme.of(context).iconTheme.color,
+          ),
+          icon: Icon(
+            Icons.home,
+            color: Theme.of(context).iconTheme.color,
+          ),
           label: 'Home',
         ),
         BottomNavigationBarItem(
           activeIcon: Icon(
             Icons.person,
+            color: Theme.of(context).iconTheme.color,
             size: 50.r,
           ),
-          icon: Icon(Icons.settings),
+          icon: Icon(
+            Icons.settings,
+            color: Theme.of(context).iconTheme.color,
+          ),
           label: 'Settings',
         ),
       ],

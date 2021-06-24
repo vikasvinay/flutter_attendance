@@ -18,21 +18,29 @@ class SubjectBloc extends Bloc<SubjectEvent, SubjectState> {
       await subJectRepository!.editSubject(
           subjectId: event.subjectId, subjectModel: event.subjectModel);
 
-      yield SubjectEdited();
+      yield SubjectState.editedState();
     } else if (event is InitalSubject) {
       await subJectRepository!.addSubject(subjectName: event.subjectName);
 
-      yield SubjectInitalState();
+      yield SubjectState.initialState();
     } else if (event is IncrementPresent) {
-      await subJectRepository!
-          .addAttendance(isPresent: true, subjectId: event.subjectId, studentUid: event.studentUid);
+      await subJectRepository!.addAttendance(
+          isPresent: true,
+          subjectId: event.subjectId,
+          studentUid: event.studentUid);
 
-      yield ChangedSubjectAttendance();
+      yield SubjectState.changeState();
     } else if (event is IncrementAbsent) {
-      await subJectRepository!
-          .addAttendance(isPresent: false, subjectId: event.subjectId,studentUid: event.studentUid);
+      await subJectRepository!.addAttendance(
+          isPresent: false,
+          subjectId: event.subjectId,
+          studentUid: event.studentUid);
 
-      yield ChangedSubjectAttendance();
+      yield SubjectState.changeState();
+    } else if (event is DeleteSubject) {
+      await subJectRepository!.deleteSubject(subjectName: event.subjectName);
+      print(event.subjectName);
+      yield SubjectState.deleteSubject();
     }
   }
 }

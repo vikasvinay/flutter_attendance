@@ -9,3 +9,5 @@ class LogIncrementState extends LogState{}
 class GotLogs extends LogState{}
 
 class Loginitial extends LogState{}
+
+class LogsDeleted extends LogState{}

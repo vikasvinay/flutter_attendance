@@ -89,34 +89,36 @@ class _MentorHomeState extends State<MentorHome> {
                     },
                   ),
                   Divider(),
-                   ListTile(
-                  leading: Icon(Icons.timeline_rounded),
-                  title: Text('Dark mode'),
-                  trailing: Switch(
-                      value: isDarkMode,
-                      onChanged: (val) {
-                        print(AppTheme.values[0]);
-                        if (isDarkMode) {
-                          _themeBloc.add(
-                              ChangeThemeEvent(appTheme: AppTheme.values[0]));
-                          setState(() {
-                            isDarkMode = false;
-                          });
-                        } else {
-                          _themeBloc.add(
-                              ChangeThemeEvent(appTheme: AppTheme.values[1]));
-                          setState(() {
-                            isDarkMode = true;
-                          });
-                        }
-                      }),
-                ),
-                Divider(),
+                  ListTile(
+                    leading: Icon(Icons.timeline_rounded),
+                    title: Text('Dark mode'),
+                    trailing: Switch(
+                        value: isDarkMode,
+                        onChanged: (val) {
+                          print(AppTheme.values[0]);
+                          if (isDarkMode) {
+                            _themeBloc.add(
+                                ChangeThemeEvent(appTheme: AppTheme.values[0]));
+                            setState(() {
+                              isDarkMode = false;
+                            });
+                          } else {
+                            _themeBloc.add(
+                                ChangeThemeEvent(appTheme: AppTheme.values[1]));
+                            setState(() {
+                              isDarkMode = true;
+                            });
+                          }
+                        }),
+                  ),
+                  Divider(),
                   ListTile(
                     leading: Icon(Icons.logout),
                     title: Text("Log out"),
                     onTap: () {
                       _authBloc.add(LogOut());
+                      _themeBloc
+                          .add(ChangeThemeEvent(appTheme: AppTheme.values[0]));
                     },
                   ),
                   Divider(),
@@ -141,7 +143,8 @@ class _MentorHomeState extends State<MentorHome> {
                     query: FirebaseFirestore.instance
                         .collection('users')
                         .where('enrolled_subjects',
-                            arrayContainsAny: _fetch.mentorModel.subjectName!).where('type', isEqualTo: 'STUDENT')
+                            arrayContainsAny: _fetch.mentorModel.subjectName!)
+                        .where('type', isEqualTo: 'STUDENT')
                         .orderBy('name', descending: true),
                     itemBuilder: (int, context, DocumentSnapshot doc) {
                       if (state.mentorModel.uid! != doc.get('uid')) {
