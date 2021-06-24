@@ -21,11 +21,11 @@ class MentorRepository {
   }
 
   Future<List<StudentModel>> getStudents(
-      {required String mentorSubjects}) async {
+      {required String mentorSubjects, required String studentYear}) async {
     List<StudentModel> _students = <StudentModel>[];
     QuerySnapshot data = await firebaseFirestore
         .collection('users')
-        .where('enrolled_subjects', arrayContainsAny: [mentorSubjects])
+        .where('enrolled_subjects', arrayContainsAny: [mentorSubjects]).where('student_year',isEqualTo: studentYear)
         .orderBy('name', descending: true).where('type',isEqualTo: 'STUDENT')
         .get();
     data.docs.forEach((element) {

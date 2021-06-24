@@ -1,6 +1,8 @@
 import 'package:attendance_app/model/logs.dart';
+import 'package:attendance_app/ui/common/common.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
 import 'package:pie_chart/pie_chart.dart';
@@ -21,7 +23,8 @@ class HistoryPage extends StatelessWidget {
   var nextTime;
   var editedTime;
   String? rawTime;
-
+  final CommonWidget _commonWidget = CommonWidget();
+  final int pageIndex =0;
   @override
   Widget build(BuildContext context) {
     Map<String, double> dataMap = {
@@ -33,6 +36,7 @@ class HistoryPage extends StatelessWidget {
       appBar: AppBar(
         title: Text('History'),
       ),
+      bottomNavigationBar: userId == FirebaseAuth.instance.currentUser!.uid ? _commonWidget.bottomNavBar(context:context, pageIndex:pageIndex): null,
       body: ListView(
         shrinkWrap: true,
         children: [

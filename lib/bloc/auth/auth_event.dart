@@ -6,8 +6,13 @@ abstract class AuthEvent extends Equatable {
   factory AuthEvent.appLaunch() => AppLaunched();
   factory AuthEvent.login(String email, String password) =>
       LoginEvent(email: email, password: password);
-  factory AuthEvent.register(String email, String password, String name) =>
-      RegisterEvent(email: email, password: password, name: name);
+  factory AuthEvent.register(
+          String email, String password, String name, String stydentYear) =>
+      RegisterEvent(
+          email: email,
+          password: password,
+          name: name,
+          studentYear: stydentYear);
   factory AuthEvent.logOut() => LogOut();
   factory AuthEvent.invalid() => UserInvalid();
   factory AuthEvent.userLoggedIn() => UserLoggedIn();
@@ -32,9 +37,13 @@ class RegisterEvent extends AuthEvent {
   final String email;
   final String password;
   final String name;
+  final String studentYear;
 
   RegisterEvent(
-      {required this.email, required this.name, required this.password});
+      {required this.email,
+      required this.name,
+      required this.password,
+      required this.studentYear});
 
   @override
   List<String> get props => [email, password, name];
@@ -46,4 +55,4 @@ class UserInvalid extends AuthEvent {}
 
 class UserLoggedIn extends AuthEvent {}
 
-class NoUser extends AuthEvent{}
+class NoUser extends AuthEvent {}

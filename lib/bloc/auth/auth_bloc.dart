@@ -38,21 +38,24 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         yield LoggedIn();
       } else {
         print("error----LoginEvent");
-
+        add(NoUser());
         yield UserError();
       }
     } else if (event is RegisterEvent) {
       bool isNext = await authRepository.register(
+          studentYear: event.studentYear,
           type: 'STUDENT',
           name: event.name,
           email: event.email,
           password: event.password);
+
       if (isNext) {
         print("user logged in-------RegisterEvent");
 
         yield LoggedIn();
       } else {
         print("error----RegisterEvent");
+        add(NoUser());
         yield UserError();
       }
     } else if (event is LogOut) {

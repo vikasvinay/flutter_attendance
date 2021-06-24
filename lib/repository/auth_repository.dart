@@ -31,6 +31,7 @@ class AuthRepository {
       {required String type,
       required String name,
       required String email,
+      required String studentYear,
       required String password}) async {
     try {
       await firebaseAuth
@@ -46,6 +47,7 @@ class AuthRepository {
           'name': name,
           'email': email,
           'type': type,
+          'student_year': studentYear,
           'photo_url':
               'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png',
           'enrolled_subjects': []

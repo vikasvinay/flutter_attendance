@@ -13,6 +13,8 @@ class RegisterPage extends StatefulWidget {
   _RegisterPageState createState() => _RegisterPageState();
 }
 
+enum Year { FIRST, SECOND, THIRD, FORTH }
+
 class _RegisterPageState extends State<RegisterPage> {
   late AuthBloc _authBloc;
   TextEditingController _email = TextEditingController();
@@ -24,30 +26,35 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   void initState() {
     _authBloc = BlocProvider.of<AuthBloc>(context);
+    selectedYear = year[0];
     super.initState();
   }
 
+  Year _studentyear = Year.FIRST;
+
+  var year = <String>['I', '	II', '	III', '	IV'];
+  late String selectedYear;
+
   @override
   Widget build(BuildContext context) {
-    BlocBuilder(
-      bloc: _authBloc,
-      builder: (context, state) {
-        if (state is UserError) {
-          return SnackBar(content: Text("Error"));
-        }
-        throw '';
-      },
-    );
     return Scaffold(
-      appBar: AppBar(
-        title: Text('register page'),
-      ),
       body: ListView(
         children: [
+          SizedBox(
+            height: 100.h,
+          ),
+          Center(
+              child: Text(
+            "Sign Up",
+            style: TextStyle(fontSize: 80.sp, fontWeight: FontWeight.bold),
+          )),
+          SizedBox(
+            height: 50.h,
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20.w),
             child: Material(
-              color: Colors.grey[200],
+              color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.all(Radius.circular(20.r)),
               child: Container(
                 height: 0.8.sw,
@@ -57,12 +64,6 @@ class _RegisterPageState extends State<RegisterPage> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
-                      Container(
-                        child: Text(
-                          "Sign Up",
-                          style: TextStyle(fontSize: 40.r),
-                        ),
-                      ),
                       _commonWidget.textField(
                           controller: _name,
                           hintText: 'name',
@@ -84,9 +85,41 @@ class _RegisterPageState extends State<RegisterPage> {
                               "Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ ",
                           validator:
                               r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'),
+                      Builder(builder: (contect) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Year:  ',
+                              style: TextStyle(fontSize: 20.sp),
+                            ),
+                            ...List.generate(
+                                Year.values.length,
+                                (index) => Row(
+                                      children: [
+                                        Text('${year[index]}',
+                                            style: TextStyle(fontSize: 16.sp)),
+                                        Radio<Year>(
+                                            value: Year.values[index],
+                                            groupValue: _studentyear,
+                                            onChanged: (val) {
+                                              setState(() {
+                                                _studentyear = val!;
+                                                selectedYear = year[index];
+                                              });
+                                            }),
+                                      ],
+                                    ))
+                          ],
+                        );
+                      }),
                       MaterialButton(
                           color: Colors.lightBlue,
-                          child: Text("Sign Up"),
+                          child: Text(
+                            "Sign Up",
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 20.sp),
+                          ),
                           onPressed: submit),
                     ],
                   ),
@@ -94,17 +127,19 @@ class _RegisterPageState extends State<RegisterPage> {
               ),
             ),
           ),
-          MaterialButton(
-            onPressed: () {
-              FluroRouting.fluroRouter.navigateTo(context, PageName.login);
-            },
-            child: Text("GO to login"),
-          ),
+          TextButton(
+              onPressed: () {
+                FluroRouting.fluroRouter.navigateTo(context, PageName.login);
+              },
+              child: Text(
+                "I'm a user!",
+                style: TextStyle(color: Colors.grey, fontSize: 16.sp),
+              )),
           BlocBuilder(
               bloc: _authBloc,
               builder: (context, state) {
                 if (state is UserError) {
-                  _commonWidget.commonToast('Invalid Details or Email exist',
+                  _commonWidget.commonToast('Invalid Details or Email not exist',
                       color: Colors.red);
                   return Container();
                 } else {
@@ -119,6 +154,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void submit() {
     if (_key.currentState!.validate()) {
       _authBloc.add(RegisterEvent(
+          studentYear: selectedYear,
           email: _email.text.trim(),
           password: _password.text.trim(),
           name: _name.text.toLowerCase().trim()));

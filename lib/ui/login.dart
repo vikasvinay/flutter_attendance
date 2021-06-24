@@ -27,83 +27,111 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // BlocBuilder(
-    //   bloc: _authBloc,
-    //   builder: (context, state) {
-    //     if (state is UserError) {
-    //       return ScaffoldMessenger.of(context)
-    //     .showSnackBar(SnackBar(content: Text("Error")));
-    //     }
-    //     throw '';
-    //   },
-    // );
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Login page'),
-      ),
       body: ListView(
         children: [
           SizedBox(
-            height: 50.h,
+            height: 100.h,
           ),
           Center(
               child: Text(
-            "Attendance App",
-            style: TextStyle(fontSize: 50, fontWeight: FontWeight.bold),
+            "Login",
+            style: TextStyle(fontSize: 100.sp, fontWeight: FontWeight.bold),
           )),
           SizedBox(
             height: 50.h,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20.w),
-            child: Material(
-              color: Colors.grey[200],
-              borderRadius: BorderRadius.all(Radius.circular(20.r)),
-              child: Container(
-                height: 0.8.sw,
-                width: 0.9.sw,
-                child: Form(
-                  key: _key,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        child: Text(
-                          "Login",
-                          style: TextStyle(fontSize: 40.r),
-                        ),
-                      ),
-                      _commonWidget.textField(
-                          controller: _email,
-                          hintText: 'email',
-                          icon: Icons.mail,
-                          errorText: "Invalid email",
-                          validator:
-                              r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"),
-                      _commonWidget.textField(
-                          controller: _password,
-                          hintText: 'password',
-                          icon: Icons.lock,
-                          errorText:
-                              "Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ ",
-                          validator:
-                              r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'),
-                      MaterialButton(
-                          color: Colors.lightBlue,
-                          child: Text("Login"),
-                          onPressed: submit),
-                    ],
-                  ),
-                ),
+
+          Container(
+            height: 0.8.sw,
+            width: 0.9.sw,
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _commonWidget.textField(
+                      controller: _email,
+                      hintText: 'Email',
+                      icon: Icons.mail,
+                      errorText: "Invalid email",
+                      validator:
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"),
+                  _commonWidget.textField(
+                      controller: _password,
+                      hintText: 'Password',
+                      icon: Icons.lock,
+                      errorText:
+                          "Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ ",
+                      validator:
+                          r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'),
+                  ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          fixedSize: Size(0.5.sw, 35.h),
+                          shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(20.r)))),
+                      onPressed: submit,
+                      child: Text("Login",
+                          style:
+                              TextStyle(fontSize: 25.sp, letterSpacing: 2.r))),
+                ],
               ),
             ),
           ),
-          MaterialButton(
-            onPressed: () {
-              FluroRouting.fluroRouter.navigateTo(context, PageName.register);
-            },
-            child: Text("Register"),
-          ),
+
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 20.w),
+          //   child: Material(
+          //     color: Colors.grey[200],
+          //     borderRadius: BorderRadius.all(Radius.circular(20.r)),
+          //     child: Container(
+          //       height: 0.8.sw,
+          //       width: 0.9.sw,
+          //       child: Form(
+          //         key: _key,
+          //         child: Column(
+          //           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          //           children: [
+          //             Container(
+          //               child: Text(
+          //                 "Login",
+          //                 style: TextStyle(fontSize: 40.r),
+          //               ),
+          //             ),
+          //             _commonWidget.textField(
+          //                 controller: _email,
+          //                 hintText: 'email',
+          //                 icon: Icons.mail,
+          //                 errorText: "Invalid email",
+          //                 validator:
+          //                     r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+"),
+          //             _commonWidget.textField(
+          //                 controller: _password,
+          //                 hintText: 'password',
+          //                 icon: Icons.lock,
+          //                 errorText:
+          //                     "Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ ",
+          //                 validator:
+          //                     r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'),
+          //             MaterialButton(
+          //                 color: Colors.lightBlue,
+          //                 child: Text("Login"),
+          //                 onPressed: submit),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          // ),
+          TextButton(
+              onPressed: () {
+                FluroRouting.fluroRouter.navigateTo(context, PageName.register);
+              },
+              child: Text(
+                "Not a user? Register here.",
+                style: TextStyle(color: Colors.grey, fontSize: 16.sp),
+              )),
           BlocBuilder(
               bloc: _authBloc,
               builder: (context, state) {

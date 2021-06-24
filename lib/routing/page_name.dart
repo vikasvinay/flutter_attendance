@@ -7,4 +7,5 @@ class PageName{
   static const mentorHome = 'mentor-home/';
   static const superAdminHome = 'super_admin-home/';
   static const addAttendance = 'mentor/add-attendance';
+  static const settings = 'student-home/settings';
 }

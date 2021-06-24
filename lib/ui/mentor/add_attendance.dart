@@ -4,6 +4,8 @@ import 'package:attendance_app/bloc/add_subject/subject_bloc.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/repository/mentor_repository.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
+import 'package:attendance_app/routing/navigator.dart';
+import 'package:attendance_app/routing/page_name.dart';
 import 'package:attendance_app/ui/common/common.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
@@ -23,6 +25,8 @@ class _AddAttendanceState extends State<AddAttendance> {
   late LogBloc _logBloc;
   late SubjectBloc _subjectBloc;
   late String subjectName;
+  late String year;
+
   CommonWidget _commonWidget = CommonWidget();
 
   MentorRepository _mentorRepository = MentorRepository();
@@ -30,12 +34,15 @@ class _AddAttendanceState extends State<AddAttendance> {
   List<bool> checkVal = [];
   List<String> studentUids = [];
   bool can = true;
+  var studentYears = <String>['I', '	II', '	III', '	IV'];
+
   @override
   void initState() {
     // _mentorBloc = BlocProvider.of<MentorBloc>(context);
     _logBloc = BlocProvider.of<LogBloc>(context);
     _subjectBloc = BlocProvider.of<SubjectBloc>(context);
     subjectName = widget.subjectsList[0];
+    year = studentYears[0];
     super.initState();
   }
 
@@ -45,7 +52,9 @@ class _AddAttendanceState extends State<AddAttendance> {
     return Scaffold(
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _save,
+        onPressed: () {
+          _save(context);
+        },
         label: Text('Save'),
         icon: Icon(Icons.save),
       ),
@@ -56,10 +65,25 @@ class _AddAttendanceState extends State<AddAttendance> {
         children: [
           Container(
             padding: EdgeInsets.all(8),
-            height: 0.1.sh,
-            color: Colors.grey[200],
-            child: Row(
-              children: [_subjectSelection(), _dateTimePicker()],
+            height: 0.15.sh,
+            color: Theme.of(context).cardColor,
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _subjectSelection(context,
+                        title: 'Select Subject:',
+                        items: widget.subjectsList,
+                        isYear: false),
+                    _subjectSelection(context,
+                        title: 'Student year: ',
+                        items: studentYears,
+                        isYear: true),
+                  ],
+                ),
+                _dateTimePicker()
+              ],
             ),
           ),
           Container(
@@ -88,7 +112,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                 ),
                 FutureBuilder<List<StudentModel>>(
                     future: _mentorRepository.getStudents(
-                        mentorSubjects: subjectName),
+                        studentYear: year, mentorSubjects: subjectName),
                     builder: (context, snap) {
                       if (!snap.hasData) {
                         return Center(child: CircularProgressIndicator());
@@ -148,74 +172,80 @@ class _AddAttendanceState extends State<AddAttendance> {
     );
   }
 
-  Container _dateTimePicker() {
-    return Container(
-      child: Row(
-        children: [
-          Text("Select Date:"),
-          SizedBox(
-            width: 10.h,
-          ),
-          Container(
-            width: 120.w,
-            child: DateTimePicker(
-              use24HourFormat: false,
-              type: DateTimePickerType.dateTime,
-              initialValue: DateTime.now().toString(),
-              firstDate: DateTime(2018),
-              lastDate: DateTime(2100),
-              onChanged: (val) {
-                setState(() {
-                  timeStamp = DateTime.parse(val).millisecondsSinceEpoch;
-                });
-                print(
-                    'onSaved: $val,fireStore time $timeStamp , now:${DateTime.fromMillisecondsSinceEpoch(timeStamp)}');
-              },
-              validator: (val) {
-                print('validator: $val');
-                return null;
-              },
-              onSaved: (val) {
-                print(DateTime.now());
-                return print('onSaved: $val, now:${DateTime.now()}');
-              },
-            ),
-          )
-        ],
-      ),
-    );
-  }
-
-  Container _subjectSelection() {
-    return Container(
-      child: Row(
-        children: [
-          Text('Select Subject:'),
-          SizedBox(
-            width: 10.h,
-          ),
-          DropdownButton<String>(
-            items: widget.subjectsList.map<DropdownMenuItem<String>>((val) {
-              return DropdownMenuItem(
-                  value: val,
-                  child: Text(val, style: TextStyle(color: Colors.black)));
-            }).toList(),
+  Widget _dateTimePicker() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text("Select Date:"),
+        SizedBox(
+          width: 10.h,
+        ),
+        Container(
+          width: 120.w,
+          child: DateTimePicker(
+            use24HourFormat: false,
+            type: DateTimePickerType.dateTime,
+            initialValue: DateTime.now().toString(),
+            firstDate: DateTime(2018),
+            lastDate: DateTime(2100),
             onChanged: (val) {
               setState(() {
-                subjectName = val as String;
+                timeStamp = DateTime.parse(val).millisecondsSinceEpoch;
               });
+              print(
+                  'onSaved: $val,fireStore time $timeStamp , now:${DateTime.fromMillisecondsSinceEpoch(timeStamp)}');
             },
-            hint: Text(subjectName),
-          )
-        ],
-      ),
+            validator: (val) {
+              print('validator: $val');
+              return null;
+            },
+            onSaved: (val) {
+              print(DateTime.now());
+              return print('onSaved: $val, now:${DateTime.now()}');
+            },
+          ),
+        )
+      ],
     );
   }
 
-  void _save() {
+  Widget _subjectSelection(BuildContext context,
+      {required String title, required List items, required bool isYear}) {
+    return Builder(builder: (context) {
+      return Container(
+        child: Row(
+          children: [
+            Text(title),
+            SizedBox(
+              width: 10.h,
+            ),
+            DropdownButton<String>(
+              items: items.map<DropdownMenuItem<String>>((val) {
+                return DropdownMenuItem(
+                    value: val,
+                    child: Text(val, style: TextStyle(color: Colors.black)));
+              }).toList(),
+              onChanged: (val) {
+                setState(() {
+                  if (!isYear) {
+                    subjectName = val as String;
+                  }
+                  if (isYear) {
+                    year = val as String;
+                  }
+                });
+              },
+              hint: Text(isYear ? year : subjectName),
+            )
+          ],
+        ),
+      );
+    });
+  }
+
+  void _save(BuildContext context) {
     print('save');
     for (int i = 0; i < studentUids.toSet().toList().length; i++) {
-
       print({checkVal[i], studentUids[i], subjectName, timeStamp});
       if (checkVal[i]) {
         _subjectBloc.add(IncrementPresent(
@@ -229,8 +259,9 @@ class _AddAttendanceState extends State<AddAttendance> {
           studentUid: studentUids[i],
           subjectName: subjectName,
           timestamp: timeStamp));
-          _commonWidget.commonToast('You have added attendance');
-      FluroRouting.fluroRouter.pop(context);
     }
+    _commonWidget.commonToast('You have added attendance');
+
+    FluroRouting.fluroRouter.pop(context);
   }
 }

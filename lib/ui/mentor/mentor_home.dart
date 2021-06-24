@@ -1,10 +1,12 @@
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/bloc/mentor/mentor_bloc.dart';
+import 'package:attendance_app/bloc/theme/theme_bloc.dart';
 import 'package:attendance_app/model/mentor_model.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
 import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/theme_data/themes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -25,10 +27,14 @@ class _MentorHomeState extends State<MentorHome> {
   late MentorModel mentor = MentorModel();
   List<String> studentIds = [];
   CommonWidget _commonWidget = CommonWidget();
+  bool isDarkMode = false;
+  late ThemeBloc _themeBloc;
 
   void initState() {
     _authBloc = BlocProvider.of<AuthBloc>(context);
     _mentorBloc = BlocProvider.of<MentorBloc>(context);
+    _themeBloc = BlocProvider.of<ThemeBloc>(context);
+
     super.initState();
   }
 
@@ -83,6 +89,29 @@ class _MentorHomeState extends State<MentorHome> {
                     },
                   ),
                   Divider(),
+                   ListTile(
+                  leading: Icon(Icons.timeline_rounded),
+                  title: Text('Dark mode'),
+                  trailing: Switch(
+                      value: isDarkMode,
+                      onChanged: (val) {
+                        print(AppTheme.values[0]);
+                        if (isDarkMode) {
+                          _themeBloc.add(
+                              ChangeThemeEvent(appTheme: AppTheme.values[0]));
+                          setState(() {
+                            isDarkMode = false;
+                          });
+                        } else {
+                          _themeBloc.add(
+                              ChangeThemeEvent(appTheme: AppTheme.values[1]));
+                          setState(() {
+                            isDarkMode = true;
+                          });
+                        }
+                      }),
+                ),
+                Divider(),
                   ListTile(
                     leading: Icon(Icons.logout),
                     title: Text("Log out"),
@@ -177,7 +206,7 @@ class _MentorHomeState extends State<MentorHome> {
       studentIds.add(studentId);
 
       return Material(
-        color: Colors.grey[200],
+        color: Theme.of(context).cardColor,
         borderRadius: BorderRadius.all(Radius.circular(20.r)),
         child: Container(
           padding: EdgeInsets.symmetric(horizontal: 10.h),

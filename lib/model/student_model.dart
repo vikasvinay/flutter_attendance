@@ -9,9 +9,11 @@ class StudentModel {
   int totalAbsent;
   List enrolledSubjects;
   String? photoUrl;
+  String studentYear;
 
   StudentModel(
       {required this.email,
+      required this.studentYear,
       required this.totalAbsent,
       required this.totalPresent,
       required this.name,
@@ -23,6 +25,7 @@ class StudentModel {
   Map<String, dynamic> toFireStore({Map<String, dynamic>? map}) {
     Map<String, dynamic> map = {};
     map['email'] = this.email;
+    map['student_year'] = this.studentYear;
     map['name'] = this.name;
     map['total_present'] = this.totalPresent;
     map['total_absent'] = this.totalAbsent;
@@ -34,6 +37,7 @@ class StudentModel {
 
   factory StudentModel.fromFireStore({required DocumentSnapshot doc}) {
     return StudentModel(
+        studentYear: doc.get('student_year') ?? 'I',
         email: doc.get('email'),
         totalAbsent: doc.get('total_absent') ?? 0,
         totalPresent: doc.get('total_present') ?? 0,

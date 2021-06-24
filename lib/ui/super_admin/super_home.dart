@@ -26,8 +26,6 @@ class _SuperhomeState extends State<Superhome> {
     super.initState();
   }
 
-
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,48 +39,60 @@ class _SuperhomeState extends State<Superhome> {
               icon: Icon(Icons.exit_to_app))
         ],
       ),
-      body: Container(
-        height: 1.sw,
-        width: 0.9.sw,
-        child: Form(
-          key: _key,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              _commonWidget.textField(
-                  controller: _mentorName,
-                  icon: Icons.perm_identity,
-                  hintText: 'name',
-                  validator: '[a-zA-Z]',
-                  errorText: 'enter correct name'),
-              _commonWidget.textField(
-                  controller: _email,
-                  icon: Icons.email,
-                  hintText: 'email',
-                  validator:
-                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
-                  errorText: 'enter correct email'),
-              _commonWidget.textField(
-                  controller: _password,
-                  icon: Icons.lock,
-                  hintText: 'password',
-                  validator:
-                      r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
-                  errorText:
-                      'Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ "'),
-              _commonWidget.textField(
-                  controller: _subjects,
-                  icon: Icons.book,
-                  hintText: 'subjects',
-                  validator: r'^[a-zA-Z, ]+$',
-                  errorText: 'enter subjects'),
-              MaterialButton(
-                  color: Colors.lightBlue,
-                  child: Text("Sign Up"),
-                  onPressed: create),
-            ],
+      body: Column(
+        children: [
+          Container(
+            alignment: Alignment.center,
+            height: 1.sw,
+            width: 0.9.sw,
+            child: Form(
+              key: _key,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _commonWidget.textField(
+                      controller: _mentorName,
+                      icon: Icons.perm_identity,
+                      hintText: 'name',
+                      validator: '[a-zA-Z]',
+                      errorText: 'enter correct name'),
+                  _commonWidget.textField(
+                      controller: _email,
+                      icon: Icons.email,
+                      hintText: 'email',
+                      validator:
+                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
+                      errorText: 'enter correct email'),
+                  _commonWidget.textField(
+                      controller: _password,
+                      icon: Icons.lock,
+                      hintText: 'password',
+                      validator:
+                          r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
+                      errorText:
+                          'Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ "'),
+                  _commonWidget.textField(
+                      controller: _subjects,
+                      icon: Icons.book,
+                      hintText: 'subjects',
+                      validator: r'^[a-zA-Z, ]+$',
+                      errorText: 'enter subjects'),
+                  
+                  MaterialButton(
+                      color: Colors.lightBlue,
+                      child: Text("Sign Up"),
+                      onPressed: create),
+                ],
+              ),
+            ),
           ),
-        ),
+          Expanded(
+                child: Text(
+                  "Note: subject should be separated as eg(maths, english)",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+        ],
       ),
     );
   }
@@ -93,7 +103,7 @@ class _SuperhomeState extends State<Superhome> {
       List<String> subjects = _subjects.text.split(',');
       List<String> data = [];
       for (int i = 0; i < subjects.length; i++) {
-        data.add(subjects[i].trim());
+        data.add(subjects[i].trim().toLowerCase());
       }
       await _authRepository
           .cerateMentor(
@@ -102,8 +112,9 @@ class _SuperhomeState extends State<Superhome> {
               mentorName: _mentorName.text,
               subjects: data)
           .then((value) {
-            _commonWidget.commonToast('You have created a mentor');
-            clear();});
+        _commonWidget.commonToast('You have created a mentor');
+        clear();
+      });
     } else {
       print('error');
     }

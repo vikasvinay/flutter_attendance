@@ -2,6 +2,7 @@ import 'package:attendance_app/routing/page_name.dart';
 import 'package:attendance_app/ui/common/history.dart';
 import 'package:attendance_app/ui/mentor/add_attendance.dart';
 import 'package:attendance_app/ui/mentor/mentor_home.dart';
+import 'package:attendance_app/ui/student/settings.dart';
 import 'package:attendance_app/ui/student/student_home.dart';
 import 'package:attendance_app/ui/login.dart';
 import 'package:attendance_app/ui/signup.dart';
@@ -31,6 +32,8 @@ class FluroRouting {
     return AddAttendance(subjectsList: subjectsList);
   });
 
+  Handler _settings = Handler(handlerFunc: (context, params)=> Settings());
+
   void routeSetup() {
     fluroRouter.define(PageName.login, handler: _login);
     fluroRouter.define(PageName.register, handler: _register);
@@ -38,6 +41,7 @@ class FluroRouting {
     fluroRouter.define(PageName.history, handler: _history);
     fluroRouter.define(PageName.mentorHome, handler: _mentorHome);
     fluroRouter.define(PageName.superAdminHome, handler: _adminHome);
+    fluroRouter.define(PageName.settings, handler: _settings);
     fluroRouter.define(PageName.addAttendance, handler: _addAttendance);
   }
 }

@@ -12,7 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:paginate_firestore/paginate_firestore.dart';
-
+import '../../ui/common/global.dart' as global;
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -26,11 +26,13 @@ class _HomePageState extends State<HomePage> {
   late LogBloc _logBloc;
   TextEditingController _subjectName = TextEditingController();
   CommonWidget _commonWidget = CommonWidget();
+  final int pageIndex = 1;
   @override
   void initState() {
     _authBloc = BlocProvider.of<AuthBloc>(context);
     _subjectBloc = BlocProvider.of<SubjectBloc>(context);
     _logBloc = BlocProvider.of<LogBloc>(context);
+    
     super.initState();
   }
 
@@ -43,6 +45,30 @@ class _HomePageState extends State<HomePage> {
           label: Text('Subject'),
           icon: Icon(Icons.add),
         ),
+        bottomNavigationBar: StreamBuilder(
+            stream: FirebaseFirestore.instance
+                .collection('users')
+                .doc(FirebaseAuth.instance.currentUser!.uid)
+                .snapshots(),
+            builder: (context, AsyncSnapshot snapshot) {
+              if (!snapshot.hasData) {
+                return Center(
+                  child: CircularProgressIndicator(),
+                );
+              }
+              StudentModel user =
+                  StudentModel.fromFireStore(doc: snapshot.data);
+                  global.totalAbsent = user.totalAbsent;
+                  global.totalPresent = user.totalPresent;
+                  global.uid = FirebaseAuth.instance.currentUser!.uid;
+                  print(global.totalPresent);
+              return _commonWidget.bottomNavBar(
+                  context: context,
+                  pageIndex: pageIndex,
+                  // totalAbsent: user.totalAbsent,
+                  // totalPresent: user.totalPresent, uid: FirebaseAuth.instance.currentUser!.uid,
+                  );
+            }),
         drawer: Drawer(
           child: StreamBuilder(
               stream: FirebaseFirestore.instance
@@ -192,7 +218,7 @@ class _HomePageState extends State<HomePage> {
     required int present,
   }) {
     return Material(
-      color: Colors.grey[200],
+      color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.all(Radius.circular(20.r)),
       child: Container(
         padding: EdgeInsets.symmetric(horizontal: 10.h),
@@ -202,7 +228,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             ListTile(
               title: Center(child: Text(subjectName.toUpperCase())),
-              trailing: Icon(Icons.double_arrow_outlined),
+              // trailing: Icon(Icons.double_arrow_outlined),
             ),
             Text("Attendance"),
             Text('$present/${present + absent}'),
