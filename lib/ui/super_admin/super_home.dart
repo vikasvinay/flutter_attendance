@@ -71,13 +71,34 @@ class _SuperhomeState extends State<Superhome> {
                           r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$',
                       errorText:
                           'Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ "'),
-                  _commonWidget.textField(
-                      controller: _subjects,
-                      icon: Icons.book,
-                      hintText: 'subjects',
-                      validator: r'^[a-zA-Z, ]+$',
-                      errorText: 'enter subjects'),
-                  
+                  // _commonWidget.textField(
+                  //     controller: _subjects,
+                  //     icon: Icons.book,
+                  //     hintText: 'subjects',
+                  //     validator: r'^[a-zA-Z, ]+$',
+                  //     errorText: 'enter subjects'),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      Icon(Icons.book),
+                      Container(
+                        width: 0.7.sw,
+                        // height: 0.1.sh,
+                        child: TextFormField(
+                          validator: (val) {
+                            return val!.length > 3 ? null : 'enter subjects';
+                          },
+                          controller: _subjects,
+                          decoration: InputDecoration(
+                              // border: OutlineInputBorder(
+                              //   borderRadius: BorderRadius.all(Radius.circular(20.r)),
+                              // ),
+                              hintText: 'subjects'),
+                        ),
+                      ),
+                    ],
+                  ),
+
                   MaterialButton(
                       color: Colors.lightBlue,
                       child: Text("Sign Up"),
@@ -87,11 +108,11 @@ class _SuperhomeState extends State<Superhome> {
             ),
           ),
           Expanded(
-                child: Text(
-                  "Note: subject should be separated as eg(maths, english)",
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
+            child: Text(
+              "Note: subject should be separated as eg(maths, english)",
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
         ],
       ),
     );
