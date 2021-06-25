@@ -6,6 +6,7 @@ import 'package:attendance_app/ui/student/settings.dart';
 import 'package:attendance_app/ui/student/student_home.dart';
 import 'package:attendance_app/ui/login.dart';
 import 'package:attendance_app/ui/signup.dart';
+import 'package:attendance_app/ui/student/subjects.dart';
 import 'package:attendance_app/ui/super_admin/super_home.dart';
 import 'package:fluro/fluro.dart';
 import 'package:flutter/cupertino.dart';
@@ -32,7 +33,9 @@ class FluroRouting {
     return AddAttendance(subjectsList: subjectsList);
   });
 
-  Handler _settings = Handler(handlerFunc: (context, params)=> Settings());
+  Handler _settings = Handler(handlerFunc: (context, params) => Settings());
+  Handler _subjects =
+      Handler(handlerFunc: (context, params) => StudentSubjects());
 
   void routeSetup() {
     fluroRouter.define(PageName.login, handler: _login);
@@ -43,5 +46,6 @@ class FluroRouting {
     fluroRouter.define(PageName.superAdminHome, handler: _adminHome);
     fluroRouter.define(PageName.settings, handler: _settings);
     fluroRouter.define(PageName.addAttendance, handler: _addAttendance);
+    fluroRouter.define(PageName.subjects, handler: _subjects);
   }
 }

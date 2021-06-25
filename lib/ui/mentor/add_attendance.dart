@@ -1,9 +1,10 @@
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
-import 'package:attendance_app/bloc/subject/subject_bloc.dart';
+import 'package:attendance_app/bloc/attendance.dart/attendance_bloc.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/repository/mentor_repository.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
+import 'package:attendance_app/ui/common/constants.dart';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -18,11 +19,10 @@ class AddAttendance extends StatefulWidget {
 }
 
 class _AddAttendanceState extends State<AddAttendance> {
-  // late MentorBloc _mentorBloc;
   late LogBloc _logBloc;
-  late SubjectBloc _subjectBloc;
   late String subjectName;
-  late String year;
+  late String studentYear;
+  late AttendanceBloc _attendanceBloc;
 
   CommonWidget _commonWidget = CommonWidget();
 
@@ -31,15 +31,13 @@ class _AddAttendanceState extends State<AddAttendance> {
   List<bool> checkVal = [];
   List<String> studentUids = [];
   bool can = true;
-  var studentYears = <String>['I', '	II', '	III', '	IV'];
 
   @override
   void initState() {
-    // _mentorBloc = BlocProvider.of<MentorBloc>(context);
     _logBloc = BlocProvider.of<LogBloc>(context);
-    _subjectBloc = BlocProvider.of<SubjectBloc>(context);
+    _attendanceBloc = BlocProvider.of<AttendanceBloc>(context);
     subjectName = widget.subjectsList[0];
-    year = studentYears[0];
+    studentYear = year[0];
     super.initState();
   }
 
@@ -66,16 +64,16 @@ class _AddAttendanceState extends State<AddAttendance> {
             color: Theme.of(context).cardColor,
             child: Column(
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Wrap(
+                  // spacing: 
                   children: [
                     _subjectSelection(context,
                         title: 'Select Subject:',
                         items: widget.subjectsList,
                         isYear: false),
                     _subjectSelection(context,
-                        title: 'Student year: ',
-                        items: studentYears,
+                        title: 'Student studentYear: ',
+                        items: year,
                         isYear: true),
                   ],
                 ),
@@ -109,7 +107,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                 ),
                 FutureBuilder<List<StudentModel>>(
                     future: _mentorRepository.getStudents(
-                        studentYear: year, mentorSubjects: subjectName),
+                        studentYear: studentYear, mentorSubjects: subjectName),
                     builder: (context, snap) {
                       if (!snap.hasData) {
                         return Center(child: CircularProgressIndicator());
@@ -126,7 +124,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                           itemCount: snap.data!.length,
                           itemBuilder: (context, index) {
                             StudentModel student = snap.data![index];
-                            studentUids.add(student.uid);
+                            studentUids.add(student.uid!);
                             return ListTile(
                               leading: Checkbox(
                                   value: checkVal[index],
@@ -136,7 +134,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                                     });
                                     print(checkVal[index]);
                                   }),
-                              title: Text(student.name),
+                              title: Text(student.name!),
                             );
                           });
                     }),
@@ -228,11 +226,11 @@ class _AddAttendanceState extends State<AddAttendance> {
                     subjectName = val as String;
                   }
                   if (isYear) {
-                    year = val as String;
+                    studentYear = val as String;
                   }
                 });
               },
-              hint: Text(isYear ? year : subjectName),
+              hint: Text(isYear ? studentYear : subjectName),
             )
           ],
         ),
@@ -245,10 +243,10 @@ class _AddAttendanceState extends State<AddAttendance> {
     for (int i = 0; i < studentUids.toSet().toList().length; i++) {
       print({checkVal[i], studentUids[i], subjectName, timeStamp});
       if (checkVal[i]) {
-        _subjectBloc.add(IncrementPresent(
+        _attendanceBloc.add(IncrementPresent(
             subjectId: subjectName, studentUid: studentUids[i]));
       } else if (!checkVal[i]) {
-        _subjectBloc.add(IncrementAbsent(
+        _attendanceBloc.add(IncrementAbsent(
             subjectId: subjectName, studentUid: studentUids[i]));
       }
       _logBloc.add(LogIncrementEvent(

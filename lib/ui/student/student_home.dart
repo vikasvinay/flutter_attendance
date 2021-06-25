@@ -5,7 +5,7 @@ import 'package:attendance_app/model/subject_model.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -59,8 +59,8 @@ class _HomePageState extends State<HomePage> {
               }
               StudentModel user =
                   StudentModel.fromFireStore(doc: snapshot.data);
-              global.totalAbsent = user.totalAbsent;
-              global.totalPresent = user.totalPresent;
+              global.totalAbsent = user.totalAbsent!;
+              global.totalPresent = user.totalPresent!;
               global.uid = FirebaseAuth.instance.currentUser!.uid;
               print(global.totalPresent);
               return _commonWidget.bottomNavBar(
@@ -271,7 +271,7 @@ class StudentDrawer extends StatelessWidget {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    await _commonWidget.imagePicker(uid: user.uid);
+                    await _commonWidget.imagePicker(uid: user.uid!);
                   },
                   child: CircleAvatar(
                     maxRadius: 80.r,
@@ -291,12 +291,12 @@ class StudentDrawer extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.people),
-                  title: Text(user.name),
+                  title: Text(user.name!),
                 ),
                 Divider(),
                 ListTile(
                   leading: Icon(Icons.email),
-                  title: Text(user.email),
+                  title: Text(user.email!),
                 ),
                 Divider(),
                 ListTile(

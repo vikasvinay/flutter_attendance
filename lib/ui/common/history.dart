@@ -1,6 +1,6 @@
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/model/logs.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:date_time_format/date_time_format.dart';
 import 'package:firebase_auth/firebase_auth.dart';

@@ -30,7 +30,7 @@ class MentorRepository {
         .get();
     data.docs.forEach((element) {
       if (firebaseAuth.currentUser!.uid != element.get('uid')) {
-        _students.add(StudentModel.fromFireStore(doc: element));
+        _students.add(StudentModel.fromFireStore(doc: element as  DocumentSnapshot<Map<String, dynamic>>));
       }
     });
     return _students;

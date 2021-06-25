@@ -1,6 +1,6 @@
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/repository/auth_repository.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

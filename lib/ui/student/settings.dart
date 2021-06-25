@@ -1,10 +1,9 @@
-import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/bloc/theme/theme_bloc.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
 import 'package:attendance_app/ui/common/theme_data/themes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -62,7 +61,7 @@ class _SettingsState extends State<Settings> {
                 ),
                 GestureDetector(
                   onTap: () async {
-                    await _commonWidget.imagePicker(uid: user.uid);
+                    await _commonWidget.imagePicker(uid: user.uid!);
                   },
                   child: CircleAvatar(
                     maxRadius: 80.r,
@@ -82,12 +81,12 @@ class _SettingsState extends State<Settings> {
                 ),
                 ListTile(
                   leading: Icon(Icons.people),
-                  title: Text(user.name),
+                  title: Text(user.name!),
                 ),
                 Divider(),
                 ListTile(
                   leading: Icon(Icons.email),
-                  title: Text(user.email),
+                  title: Text(user.email!),
                 ),
                 Divider(),
                 ListTile(
@@ -112,6 +111,16 @@ class _SettingsState extends State<Settings> {
                         }
                       }),
                 ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.book),
+                  title: Text('Subjects'),
+                  onTap: () {
+                    FluroRouting.fluroRouter
+                        .navigateTo(context, PageName.subjects);
+                  },
+                ),
+
                 //   Radio(
                 //       value: AppTheme.BlueLight,
                 //       groupValue: _appTheme,
@@ -136,8 +145,8 @@ class _SettingsState extends State<Settings> {
                   title: Text("Log out"),
                   onTap: () {
                     _authBloc.add(LogOut());
-                    _themeBloc.add(
-                              ChangeThemeEvent(appTheme: AppTheme.values[0]));
+                    _themeBloc
+                        .add(ChangeThemeEvent(appTheme: AppTheme.values[0]));
                   },
                 ),
                 Divider(),

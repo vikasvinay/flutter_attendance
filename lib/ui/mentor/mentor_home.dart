@@ -5,7 +5,7 @@ import 'package:attendance_app/model/mentor_model.dart';
 import 'package:attendance_app/model/student_model.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
-import 'package:attendance_app/ui/common/common.dart';
+import 'package:attendance_app/ui/common/common_widget.dart';
 import 'package:attendance_app/ui/common/theme_data/themes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -149,7 +149,7 @@ class _MentorHomeState extends State<MentorHome> {
                     itemBuilder: (int, context, DocumentSnapshot doc) {
                       if (state.mentorModel.uid! != doc.get('uid')) {
                         StudentModel student =
-                            StudentModel.fromFireStore(doc: doc);
+                            StudentModel.fromFireStore(doc: doc as  DocumentSnapshot<Map<String, dynamic>>);
                         print(_fetch.mentorModel.subjectName!);
                         return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -165,12 +165,12 @@ class _MentorHomeState extends State<MentorHome> {
                               },
                               child: studentCard(
                                   photoUrl: student.photoUrl!,
-                                  totalPresent: student.totalPresent,
-                                  totalabsent: student.totalAbsent,
+                                  totalPresent: student.totalPresent!,
+                                  totalabsent: student.totalAbsent!,
                                   mentorId: state.mentorModel.uid!,
-                                  studentSubjects: student.enrolledSubjects,
-                                  studentId: student.uid,
-                                  studentName: student.name,
+                                  studentSubjects: student.enrolledSubjects!,
+                                  studentId: student.uid!,
+                                  studentName: student.name!,
                                   mentorSubjects:
                                       _fetch.mentorModel.subjectName!),
                             ));

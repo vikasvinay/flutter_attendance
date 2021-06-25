@@ -18,9 +18,10 @@ class Logs {
   }
 
   factory Logs.fromFirestore({required DocumentSnapshot doc}) {
+    var data = (doc.data() as dynamic);
     return Logs(
-        attendance: doc['attendance'],
-        subjectName: doc['subject_name'],
-        timestamp: doc['timestamp']);
+        attendance: data['attendance'],
+        subjectName: data['subject_name'],
+        timestamp: data['timestamp']);
   }
 }

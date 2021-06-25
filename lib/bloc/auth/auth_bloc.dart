@@ -44,6 +44,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       }
     } else if (event is RegisterEvent) {
       bool isNext = await authRepository.register(
+          branch: 'CSE',
           studentYear: event.studentYear,
           type: 'STUDENT',
           name: event.name,

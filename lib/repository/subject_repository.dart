@@ -72,22 +72,22 @@ class SubJectRepository {
     }, SetOptions(merge: true));
   }
 
-  Future<void> addAttendance(
-      {required bool isPresent,
-      required String subjectId,
-      required String studentUid}) async {
-    String type = isPresent ? 'present' : 'absent';
-    String mainType = isPresent ? 'total_present' : 'total_absent';
-    await firebaseFirestore
-        .collection('users')
-        .doc(studentUid)
-        .collection('subjects')
-        .doc(subjectId)
-        .update({type: FieldValue.increment(1)});
-    await firebaseFirestore.collection('users').doc(studentUid).update(
-      {
-        mainType: FieldValue.increment(1),
-      },
-    );
-  }
+  // Future<void> addAttendance(
+  //     {required bool isPresent,
+  //     required String subjectId,
+  //     required String studentUid}) async {
+  //   String type = isPresent ? 'present' : 'absent';
+  //   String mainType = isPresent ? 'total_present' : 'total_absent';
+  //   await firebaseFirestore
+  //       .collection('users')
+  //       .doc(studentUid)
+  //       .collection('subjects')
+  //       .doc(subjectId)
+  //       .update({type: FieldValue.increment(1)});
+  //   await firebaseFirestore.collection('users').doc(studentUid).update(
+  //     {
+  //       mainType: FieldValue.increment(1),
+  //     },
+  //   );
+  // }
 }

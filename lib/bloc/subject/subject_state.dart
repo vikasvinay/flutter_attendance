@@ -4,7 +4,7 @@ abstract class SubjectState {
   const SubjectState();
 
   factory SubjectState.emptyState() => EmptyState();
-  factory SubjectState.changeState() => ChangedSubjectAttendance();
+  // factory SubjectState.changeState() => ChangedSubjectAttendance();
   factory SubjectState.initialState() => SubjectInitalState();
   factory SubjectState.editedState() => SubjectEdited();
   factory SubjectState.deleteSubject() => SubjectDeleted();
@@ -12,7 +12,7 @@ abstract class SubjectState {
 
 class EmptyState extends SubjectState {}
 
-class ChangedSubjectAttendance extends SubjectState {}
+// class ChangedSubjectAttendance extends SubjectState {}
 
 class SubjectInitalState extends SubjectState {}
 

@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
+import 'package:attendance_app/bloc/attendance.dart/attendance_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/bloc/mentor/mentor_bloc.dart';
 import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/theme/theme_bloc.dart';
 import 'package:attendance_app/model/user_model.dart';
+import 'package:attendance_app/repository/attendance_repository.dart';
 import 'package:attendance_app/repository/auth_repository.dart';
 import 'package:attendance_app/repository/log_repository.dart';
 import 'package:attendance_app/repository/mentor_repository.dart';
@@ -41,7 +43,10 @@ void main() async {
     ),
     BlocProvider<MentorBloc>(
       create: (context) => MentorBloc(MentorRepository())..add(FetchMentor()),
-    )
+    ),
+    BlocProvider(
+        create: (context) => AttendanceBloc(AttendanceRepository())
+          ..add(AttendanceEvent.emptyEvent()))
   ], child: Core()));
 }
 
@@ -54,12 +59,10 @@ class Core extends StatefulWidget {
 
 class _CoreState extends State<Core> {
   late AuthBloc _authBloc;
-  late ThemeBloc _themeBloc;
   @override
   void initState() {
     FluroRouting().routeSetup();
     _authBloc = BlocProvider.of<AuthBloc>(context);
-    _themeBloc = BlocProvider.of<ThemeBloc>(context);
     super.initState();
   }
 
@@ -86,7 +89,7 @@ class _CoreState extends State<Core> {
                       );
                     } else {
                       UserModel user = UserModel.fromFireStore(
-                          doc: snap.data as DocumentSnapshot);
+                          doc: snap.requireData as DocumentSnapshot);
                       log('UID: ${FirebaseAuth.instance.currentUser!.uid}');
 
                       log('LOGIN TYPE: ${user.type}');
@@ -110,60 +113,8 @@ class _CoreState extends State<Core> {
             onGenerateRoute: FluroRouting.fluroRouter.generator,
             home: LoginPage(),
           );
-          
         }
       });
-
-      BlocBuilder<ThemeBloc, ThemeState>(
-        // bloc: _themeBloc,
-        builder: (context, themeState) {
-          print(themeState);
-          print('`````````````````````````');
-          ThemeData theme = themeState.appTheme;
-          return MaterialApp(
-            theme: theme,
-            debugShowCheckedModeBanner: false,
-            onGenerateRoute: FluroRouting.fluroRouter.generator,
-            home: BlocBuilder(
-              bloc: _authBloc,
-              builder: (context, loginState) {
-                if (loginState is LoggedIn) {
-                  return FutureBuilder(
-                      future: FirebaseFirestore.instance
-                          .collection('users')
-                          .doc(FirebaseAuth.instance.currentUser!.uid)
-                          .get(),
-                      builder: (context, snap) {
-                        if (!snap.hasData) {
-                          return Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        } else {
-                          UserModel user = UserModel.fromFireStore(
-                              doc: snap.data as DocumentSnapshot);
-                          log('UID: ${FirebaseAuth.instance.currentUser!.uid}');
-
-                          log('LOGIN TYPE: ${user.type}');
-                          if (user.type == 'STUDENT') {
-                            return HomePage();
-                          } else if (user.type == 'MENTOR') {
-                            return MentorHome();
-                          } else if (user.type == 'ADMIN') {
-                            return Superhome();
-                          } else {
-                            _authBloc.add(LogOut());
-                            return LoginPage();
-                          }
-                        }
-                      });
-                } else {
-                  return LoginPage();
-                }
-              },
-            ),
-          );
-        },
-      );
     });
   }
 }

@@ -7,7 +7,12 @@ class SubjectModel {
   int? absent;
   int? present;
 
-  SubjectModel({this.absent, this.present, this.subjectName, this.timestamp, this.subjectId});
+  SubjectModel(
+      {this.absent,
+      this.present,
+      this.subjectName,
+      this.timestamp,
+      this.subjectId});
 
   Map<String, dynamic> toFirestore({Map<String, dynamic>? map}) {
     Map<String, dynamic> map = {};
@@ -20,11 +25,13 @@ class SubjectModel {
   }
 
   factory SubjectModel.fromFirestore({required DocumentSnapshot doc}) {
+    var data = (doc.data() as dynamic);
+
     return SubjectModel(
-        absent: doc['absent'],
-        present: doc['present'],
-        subjectName: doc['subject_name'],
-        subjectId: doc['subject_id'],
-        timestamp: doc['timestamp'] as Timestamp);
+        absent: data['absent'],
+        present: data['present'],
+        subjectName: data['subject_name'],
+        subjectId: data['subject_id'],
+        timestamp: data['timestamp'] as Timestamp);
   }
 }

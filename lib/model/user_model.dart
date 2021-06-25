@@ -23,10 +23,12 @@ class UserModel {
   }
 
   factory UserModel.fromFireStore({required DocumentSnapshot doc}) {
+        var data = (doc.data() as dynamic);
+
     return UserModel(
-        email: doc.get('email'),
-        name: doc.get('name'),
-        type: doc.get('type'),
-        uid: doc.get('uid'));
+        email: data['email'],
+        name: data['name'],
+        type: data['type'],
+        uid: data['uid']);
   }
 }

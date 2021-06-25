@@ -21,14 +21,15 @@ class MentorModel {
   }
 
   factory MentorModel.fromFireStore({required DocumentSnapshot doc}) {
+    var data = (doc.data() as dynamic);
     return MentorModel(
-        email: doc['email'],
-        name: doc['name'],
-        type: doc['type'],
-        subjectName: doc['enrolled_subjects'].runtimeType == String
-            ? [doc['enrolled_subjects']]
-            : doc['enrolled_subjects'],
-        photoUrl: doc['photo_url'],
-        uid: doc['uid']);
+        email: data['email'],
+        name: data['name'],
+        type: data['type'],
+        subjectName: data['enrolled_subjects'].runtimeType == String
+            ? [data['enrolled_subjects']]
+            : data['enrolled_subjects'],
+        photoUrl: data['photo_url'],
+        uid: data['uid']);
   }
 }

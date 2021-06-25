@@ -9,11 +9,11 @@ abstract class SubjectEvent extends Equatable {
   factory SubjectEvent.addSubject(
           String subjectId, SubjectModel subjectModel) =>
       EditSubject(subjectId: subjectId, subjectModel: subjectModel);
-  factory SubjectEvent.present(
-          bool isPresent, String subjectId, String studentUid) =>
-      IncrementPresent(subjectId: subjectId, studentUid: studentUid);
-  factory SubjectEvent.absent(String studentUid, String subjectId) =>
-      IncrementAbsent(subjectId: subjectId, studentUid: studentUid);
+  // factory SubjectEvent.present(
+  //         bool isPresent, String subjectId, String studentUid) =>
+  //     IncrementPresent(subjectId: subjectId, studentUid: studentUid);
+  // factory SubjectEvent.absent(String studentUid, String subjectId) =>
+  //     IncrementAbsent(subjectId: subjectId, studentUid: studentUid);
   factory SubjectEvent.deletSubject(String subjectName) =>
       DeleteSubject(subjectName: subjectName);
 }
@@ -40,25 +40,25 @@ class InitalSubject extends SubjectEvent {
   List<Object> get props => [subjectName];
 }
 
-class IncrementPresent extends SubjectEvent {
-  final String studentUid;
-  final String subjectId;
+// class IncrementPresent extends SubjectEvent {
+//   final String studentUid;
+//   final String subjectId;
 
-  IncrementPresent({required this.subjectId, required this.studentUid});
+//   IncrementPresent({required this.subjectId, required this.studentUid});
 
-  @override
-  List<String> get props => [subjectId, studentUid];
-}
+//   @override
+//   List<String> get props => [subjectId, studentUid];
+// }
 
-class IncrementAbsent extends SubjectEvent {
-  final String studentUid;
-  final String subjectId;
+// class IncrementAbsent extends SubjectEvent {
+//   final String studentUid;
+//   final String subjectId;
 
-  IncrementAbsent({required this.subjectId, required this.studentUid});
+//   IncrementAbsent({required this.subjectId, required this.studentUid});
 
-  @override
-  List<String> get props => [subjectId, studentUid];
-}
+//   @override
+//   List<String> get props => [subjectId, studentUid];
+// }
 
 class DeleteSubject extends SubjectEvent {
   final String subjectName;
@@ -66,4 +66,9 @@ class DeleteSubject extends SubjectEvent {
 
   @override
   List<String> get props => [subjectName];
+}
+
+class GetAllSubjects extends SubjectEvent {
+  @override
+  List<Object?> get props => [];
 }

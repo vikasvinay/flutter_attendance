@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
 
+import 'package:attendance_app/model/student_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -14,6 +15,8 @@ class AuthRepository {
       {FirebaseAuth? firebaseAuth, FirebaseFirestore? firebaseFirestore})
       : firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
+
+  StudentModel _studentModel = StudentModel();
 
   Future<bool> loginWithEmail(
       {required String email, required String password}) async {
@@ -32,26 +35,43 @@ class AuthRepository {
       required String name,
       required String email,
       required String studentYear,
+      required String branch,
       required String password}) async {
     try {
       await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) async {
+        _studentModel.branch = branch;
+        _studentModel.email = email;
+        _studentModel.enrolledSubjects = [];
+        _studentModel.name = name;
+        _studentModel.photoUrl =
+            'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png';
+        _studentModel.studentYear = studentYear;
+        _studentModel.totalAbsent = FieldValue.increment(0) as int;
+        _studentModel.totalPresent = FieldValue.increment(0) as int;
+        _studentModel.type = 'STUDENT';
+        _studentModel.uid = FirebaseAuth.instance.currentUser!.uid;
+
         await firebaseFirestore
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
-            .set({
-          'uid': FirebaseAuth.instance.currentUser!.uid,
-          'total_present': FieldValue.increment(0),
-          'total_absent': FieldValue.increment(0),
-          'name': name,
-          'email': email,
-          'type': type,
-          'student_year': studentYear,
-          'photo_url':
-              'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png',
-          'enrolled_subjects': []
-        }, SetOptions(merge: true));
+            .set(
+                _studentModel.toFireStore()
+                // {
+                // 'uid': ,
+                //   'total_present':
+                //   'total_absent': FieldValue.increment(0),
+                //   'name': name,
+                //   'email': email,
+                //   'type': type,
+                //   'student_year': studentYear,
+
+                //   'photo_url':
+                //   'enrolled_subjects': []
+                // }
+                ,
+                SetOptions(merge: true));
       });
       return true;
     } on FirebaseAuthException catch (e) {
@@ -88,6 +108,7 @@ class AuthRepository {
       await app.delete();
       return true;
     } on FirebaseAuthException catch (e) {
+      print(e);
       return false;
     }
   }
