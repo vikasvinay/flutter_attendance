@@ -32,6 +32,7 @@ class StudentModel {
     map['total_present'] = this.totalPresent;
     map['total_absent'] = this.totalAbsent;
     map['type'] = this.type;
+    map['photo_url'] = this.photoUrl;
     map['enrolled_subjects'] = this.enrolledSubjects;
     map['branch'] = this.branch;
     map['uid'] = this.uid;

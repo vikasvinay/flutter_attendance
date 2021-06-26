@@ -48,8 +48,8 @@ class AuthRepository {
         _studentModel.photoUrl =
             'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png';
         _studentModel.studentYear = studentYear;
-        _studentModel.totalAbsent = FieldValue.increment(0) as int;
-        _studentModel.totalPresent = FieldValue.increment(0) as int;
+        _studentModel.totalAbsent = 0;
+        _studentModel.totalPresent = 0;
         _studentModel.type = 'STUDENT';
         _studentModel.uid = FirebaseAuth.instance.currentUser!.uid;
 

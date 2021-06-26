@@ -1,5 +1,6 @@
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
+import 'package:attendance_app/bloc/student/student_bloc.dart';
 import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/model/subject_model.dart';
 import 'package:attendance_app/model/student_model.dart';
@@ -33,6 +34,7 @@ class _HomePageState extends State<HomePage> {
     // _authBloc = BlocProvider.of<AuthBloc>(context);
     _subjectBloc = BlocProvider.of<SubjectBloc>(context);
     _logBloc = BlocProvider.of<LogBloc>(context);
+    BlocProvider.of<StudentBloc>(context)..add(StudentEvent.getStudent());
 
     super.initState();
   }
@@ -42,7 +44,9 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
         floatingActionButton: FloatingActionButton.extended(
-          onPressed: _popUp,
+          onPressed: () {
+            FluroRouting.fluroRouter.navigateTo(context, PageName.subjects);
+          }, //_popUp,
           label: Text('Subject'),
           icon: Icon(Icons.add),
         ),
@@ -140,13 +144,14 @@ class _HomePageState extends State<HomePage> {
     required int present,
   }) {
     void _deleteSubject() {
-    _subjectBloc
-        .add(SubjectEvent.deletSubject(subjectName.trim().toLowerCase()));
-    _commonWidget.commonToast(
-        'You have deleted ${subjectName.toUpperCase().trim()}');
-    _logBloc.add(LogEvent.addSubject(
-        '${subjectName.toUpperCase().trim()}\nDeleted'));
-  }
+      _subjectBloc
+          .add(SubjectEvent.deletSubject(subjectName.trim()));
+      _commonWidget
+          .commonToast('You have deleted ${subjectName.trim()}');
+      _logBloc.add(
+          LogEvent.addSubject('${subjectName.toUpperCase().trim()}\nDeleted'));
+    }
+
     return Material(
       color: Theme.of(context).cardColor,
       borderRadius: BorderRadius.all(Radius.circular(20.r)),
@@ -159,9 +164,15 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                Text(
-                  subjectName.toUpperCase(),
-                  style: Theme.of(context).textTheme.subtitle1!..fontSize,
+                Container(
+                  width: 90.h,
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Text(
+                      subjectName.toUpperCase(),
+                      style: Theme.of(context).textTheme.subtitle1!..fontSize,
+                    ),
+                  ),
                 ),
                 Spacer(),
                 IconButton(
@@ -224,7 +235,6 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
-    
   }
 
   Future<void> _addSubject() async {
@@ -232,8 +242,6 @@ class _HomePageState extends State<HomePage> {
     _logBloc.add(LogSubjectAdd(subjectName: _subjectName.text));
     FluroRouting.fluroRouter.pop(context);
   }
-
-  
 }
 
 class StudentDrawer extends StatelessWidget {

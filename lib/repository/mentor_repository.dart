@@ -21,16 +21,19 @@ class MentorRepository {
   }
 
   Future<List<StudentModel>> getStudents(
-      {required String mentorSubjects, required String studentYear}) async {
+      {required String mentorSubjects, required String studentYear, required String branch}) async {
     List<StudentModel> _students = <StudentModel>[];
     QuerySnapshot data = await firebaseFirestore
         .collection('users')
-        .where('enrolled_subjects', arrayContainsAny: [mentorSubjects]).where('student_year',isEqualTo: studentYear)
-        .orderBy('name', descending: true).where('type',isEqualTo: 'STUDENT')
+        .where('enrolled_subjects', arrayContainsAny: [mentorSubjects])
+        .where('student_year', isEqualTo: studentYear)
+        .orderBy('name', descending: true)
+        .where('type', isEqualTo: 'STUDENT').where('branch', isEqualTo: branch)
         .get();
     data.docs.forEach((element) {
       if (firebaseAuth.currentUser!.uid != element.get('uid')) {
-        _students.add(StudentModel.fromFireStore(doc: element as  DocumentSnapshot<Map<String, dynamic>>));
+        _students.add(StudentModel.fromFireStore(
+            doc: element as DocumentSnapshot<Map<String, dynamic>>));
       }
     });
     return _students;

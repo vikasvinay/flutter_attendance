@@ -16,6 +16,9 @@ abstract class SubjectEvent extends Equatable {
   //     IncrementAbsent(subjectId: subjectId, studentUid: studentUid);
   factory SubjectEvent.deletSubject(String subjectName) =>
       DeleteSubject(subjectName: subjectName);
+
+  factory SubjectEvent.getAllSubjects(String year, String branch) =>
+      GetAllSubjects(branch: branch, year: year);
 }
 
 class EmptyEvent extends SubjectEvent {
@@ -69,6 +72,9 @@ class DeleteSubject extends SubjectEvent {
 }
 
 class GetAllSubjects extends SubjectEvent {
+  final String year;
+  final String branch;
+  GetAllSubjects({required this.branch, required this.year});
   @override
-  List<Object?> get props => [];
+  List<String> get props => [year, branch];
 }

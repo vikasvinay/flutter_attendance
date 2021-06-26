@@ -7,9 +7,10 @@ abstract class AuthEvent extends Equatable {
   factory AuthEvent.login(String email, String password) =>
       LoginEvent(email: email, password: password);
   factory AuthEvent.register(
-          String email, String password, String name, String stydentYear) =>
+          String email, String password, String name, String stydentYear, String branch) =>
       RegisterEvent(
           email: email,
+          branch: branch,
           password: password,
           name: name,
           studentYear: stydentYear);
@@ -34,6 +35,7 @@ class LoginEvent extends AuthEvent {
 }
 
 class RegisterEvent extends AuthEvent {
+  final String branch;
   final String email;
   final String password;
   final String name;
@@ -41,6 +43,7 @@ class RegisterEvent extends AuthEvent {
 
   RegisterEvent(
       {required this.email,
+      required this.branch,
       required this.name,
       required this.password,
       required this.studentYear});

@@ -148,8 +148,8 @@ class _MentorHomeState extends State<MentorHome> {
                         .orderBy('name', descending: true),
                     itemBuilder: (int, context, DocumentSnapshot doc) {
                       if (state.mentorModel.uid! != doc.get('uid')) {
-                        StudentModel student =
-                            StudentModel.fromFireStore(doc: doc as  DocumentSnapshot<Map<String, dynamic>>);
+                        StudentModel student = StudentModel.fromFireStore(
+                            doc: doc as DocumentSnapshot<Map<String, dynamic>>);
                         print(_fetch.mentorModel.subjectName!);
                         return Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -222,24 +222,17 @@ class _MentorHomeState extends State<MentorHome> {
                 backgroundImage: NetworkImage(photoUrl),
                 backgroundColor: Colors.lightBlue,
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Name: $studentName'), //Text(studentName)
-                ],
-              ),
+              SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text('Name: $studentName')),
               Wrap(
+                // mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text('Subjects: '),
-                      ...List.generate(
-                        subjects.length,
-                        (index) => Text('${subjects[index]}, '),
-                      ), //Text(subjects.toString())
-                    ],
-                  ),
+                  Text('Subjects: '),
+                  ...List.generate(
+                    subjects.length,
+                    (index) => Text('${subjects[index]}, '),
+                  ), //Text(subjects.toString())
                 ],
               ),
               Text('Total classes: ${totalPresent + totalabsent}'),

@@ -1,6 +1,7 @@
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
-import 'package:attendance_app/bloc/attendance.dart/attendance_bloc.dart';
+import 'package:attendance_app/bloc/attendance/attendance_bloc.dart';
 import 'package:attendance_app/model/student_model.dart';
+import 'package:attendance_app/repository/all_subjects_repositort.dart';
 import 'package:attendance_app/repository/mentor_repository.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/ui/common/common_widget.dart';
@@ -23,6 +24,7 @@ class _AddAttendanceState extends State<AddAttendance> {
   late String subjectName;
   late String studentYear;
   late AttendanceBloc _attendanceBloc;
+  AllSubjectsRepository _allSubjectsRepository = AllSubjectsRepository();
 
   CommonWidget _commonWidget = CommonWidget();
 
@@ -30,6 +32,8 @@ class _AddAttendanceState extends State<AddAttendance> {
   int timeStamp = DateTime.now().millisecondsSinceEpoch;
   List<bool> checkVal = [];
   List<String> studentUids = [];
+  String branchSelected = 'IT';
+
   bool can = true;
 
   @override
@@ -60,23 +64,30 @@ class _AddAttendanceState extends State<AddAttendance> {
         children: [
           Container(
             padding: EdgeInsets.all(8),
-            height: 0.15.sh,
+            height: 0.2.sh,
             color: Theme.of(context).cardColor,
-            child: Column(
+            child: Wrap(
+              direction: Axis.vertical,
               children: [
-                Wrap(
-                  // spacing: 
-                  children: [
-                    _subjectSelection(context,
-                        title: 'Select Subject:',
-                        items: widget.subjectsList,
-                        isYear: false),
-                    _subjectSelection(context,
-                        title: 'Student studentYear: ',
-                        items: year,
-                        isYear: true),
-                  ],
-                ),
+                _dropDown(context,
+                    title: 'Select Subject:',
+                    items: widget.subjectsList,
+                    isYear: false),
+                _dropDown(context, title: 'Year: ', items: year, isYear: true),
+                FutureBuilder<List<String>>(
+                    future: _allSubjectsRepository.getonlyBranchs(),
+                    builder: (context, snapshot) {
+                      if (!snapshot.hasData) {
+                        return Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      }
+                      return _dropDown(context,
+                          title: 'Branch',
+                          items: snapshot.requireData,
+                          isbranch: true,
+                          isYear: false);
+                    }),
                 _dateTimePicker()
               ],
             ),
@@ -107,7 +118,9 @@ class _AddAttendanceState extends State<AddAttendance> {
                 ),
                 FutureBuilder<List<StudentModel>>(
                     future: _mentorRepository.getStudents(
-                        studentYear: studentYear, mentorSubjects: subjectName),
+                        branch: branchSelected,
+                        studentYear: studentYear,
+                        mentorSubjects: subjectName),
                     builder: (context, snap) {
                       if (!snap.hasData) {
                         return Center(child: CircularProgressIndicator());
@@ -204,8 +217,11 @@ class _AddAttendanceState extends State<AddAttendance> {
     );
   }
 
-  Widget _subjectSelection(BuildContext context,
-      {required String title, required List items, required bool isYear}) {
+  Widget _dropDown(BuildContext context,
+      {required String title,
+      required List items,
+      required bool isYear,
+      bool isbranch = false}) {
     return Builder(builder: (context) {
       return Container(
         child: Row(
@@ -227,10 +243,16 @@ class _AddAttendanceState extends State<AddAttendance> {
                   }
                   if (isYear) {
                     studentYear = val as String;
+                  } else if (isbranch) {
+                    branchSelected = val as String;
                   }
                 });
               },
-              hint: Text(isYear ? studentYear : subjectName),
+              hint: Text(isbranch
+                  ? branchSelected
+                  : isYear
+                      ? studentYear
+                      : subjectName),
             )
           ],
         ),

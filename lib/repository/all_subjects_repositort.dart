@@ -11,15 +11,21 @@ class AllSubjectsRepository {
       : firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
-  Future<List<AllSubjects>> getAllSubjects() async {
-    var _subjects = <AllSubjects>[];
+  Future<YearSubjects> getYearSubjects(
+      {required String year, required String branch}) async {
+    var data =
+        await firebaseFirestore.collection('all_subjects').doc(branch).get();
+    Map<String, dynamic> subjects = await data[year];
+    
+    return  YearSubjects.fromFirestore(map: subjects);
+  }
 
-    var data = await firebaseFirestore.collection('subjects').get();
-
+  Future<List<String>> getonlyBranchs() async {
+    List<String> branch = [];
+    var data = await firebaseFirestore.collection('all_subjects').get();
     data.docs.forEach((doc) {
-      _subjects.add(AllSubjects.fromFirestore(doc: doc));
+      branch.add(doc.id);
     });
-
-    return _subjects;
+    return branch;
   }
 }

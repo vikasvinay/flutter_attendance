@@ -21,7 +21,6 @@ class MentorBloc extends Bloc<MentorEvent, MentorState>{
      if(event is FetchMentor){
       mentorRepository.getMentorData().listen((event) {
         mentorModel = event;
-        print(event.subjectName);
        add(RecivedMentorData(mentorModel: event));
 
        });

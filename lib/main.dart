@@ -1,9 +1,10 @@
 import 'dart:developer';
 
 import 'package:attendance_app/bloc/add_log/log_bloc.dart';
-import 'package:attendance_app/bloc/attendance.dart/attendance_bloc.dart';
+import 'package:attendance_app/bloc/attendance/attendance_bloc.dart';
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
 import 'package:attendance_app/bloc/mentor/mentor_bloc.dart';
+import 'package:attendance_app/bloc/student/student_bloc.dart';
 import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/bloc/theme/theme_bloc.dart';
 import 'package:attendance_app/model/user_model.dart';
@@ -35,7 +36,8 @@ void main() async {
     BlocProvider<AuthBloc>(
         create: (context) => AuthBloc(AuthRepository())..add(AppLaunched())),
     BlocProvider<SubjectBloc>(
-      create: (context) => SubjectBloc(SubJectRepository())..add(EmptyEvent()),
+      create: (context) =>
+          SubjectBloc(SubJectRepository())..add(SubjectEvent.empty()),
     ),
     BlocProvider<LogBloc>(
       create: (context) =>
@@ -44,6 +46,8 @@ void main() async {
     BlocProvider<MentorBloc>(
       create: (context) => MentorBloc(MentorRepository())..add(FetchMentor()),
     ),
+    BlocProvider(
+        create: (context) => StudentBloc()..add(StudentEvent.emptyEvent())),
     BlocProvider(
         create: (context) => AttendanceBloc(AttendanceRepository())
           ..add(AttendanceEvent.emptyEvent()))

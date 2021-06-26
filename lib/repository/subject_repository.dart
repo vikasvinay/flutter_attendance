@@ -28,12 +28,12 @@ class SubJectRepository {
         .collection('users')
         .doc(firebaseAuth.currentUser!.uid)
         .collection('subjects')
-        .doc(subjectName.toLowerCase().trim());
+        .doc(subjectName.trim());
     _subjectModel.absent = 0;
     _subjectModel.present = 0;
-    _subjectModel.subjectName = subjectName.toLowerCase().trim();
+    _subjectModel.subjectName = subjectName.trim();
     _subjectModel.timestamp = Timestamp.fromDate(DateTime.now());
-    _subjectModel.subjectId = subjectName.toLowerCase().trim();
+    _subjectModel.subjectId = subjectName.trim();
 
     await docId.set(_subjectModel.toFirestore(), SetOptions(merge: true));
     await firebaseFirestore
@@ -43,7 +43,7 @@ class SubJectRepository {
       'total_absent': FieldValue.increment(0),
       'total_present': FieldValue.increment(0),
       'enrolled_subjects':
-          FieldValue.arrayUnion([subjectName.toLowerCase().trim()])
+          FieldValue.arrayUnion([subjectName.trim()])
     }, SetOptions(merge: true));
   }
 

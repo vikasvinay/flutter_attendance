@@ -1,4 +1,6 @@
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
+import 'package:attendance_app/bloc/subject/subject_bloc.dart';
+import 'package:attendance_app/repository/all_subjects_repositort.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';
 import 'package:attendance_app/ui/common/common_widget.dart';
@@ -24,9 +26,13 @@ class _RegisterPageState extends State<RegisterPage> {
 
   GlobalKey<FormState> _key = GlobalKey<FormState>();
   CommonWidget _commonWidget = CommonWidget();
+  AllSubjectsRepository _allSubjectsRepository = AllSubjectsRepository();
+  String branchSelected = 'IT';
   @override
   void initState() {
     _authBloc = BlocProvider.of<AuthBloc>(context);
+    // _subjectBloc = BlocProvider.of<>(context)..add(event);
+    print(_allSubjectsRepository.getonlyBranchs());
     selectedYear = year[0];
     super.initState();
   }
@@ -57,7 +63,7 @@ class _RegisterPageState extends State<RegisterPage> {
               color: Theme.of(context).cardColor,
               borderRadius: BorderRadius.all(Radius.circular(20.r)),
               child: Container(
-                height: 0.8.sw,
+                height: 0.9.sw,
                 width: 0.9.sw,
                 child: Form(
                   key: _key,
@@ -66,7 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     children: [
                       _commonWidget.textField(
                           controller: _name,
-                          hintText: 'name',
+                          hintText: 'full name',
                           errorText: 'Invalid name or name is used',
                           icon: Icons.people,
                           validator: '[a-zA-Z]'),
@@ -85,6 +91,40 @@ class _RegisterPageState extends State<RegisterPage> {
                               "Minimum length 8\nWith A-Z, a-z, 0-9 and !@#\$%^&*~ ",
                           validator:
                               r'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[!@#\$&*~]).{8,}$'),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('Branch: ',style: TextStyle(fontSize: 20.sp)),
+                          SizedBox(
+                            width: 20.w,
+                          ),
+                          FutureBuilder<List<String>>(
+                              future: _allSubjectsRepository.getonlyBranchs(),
+                              builder: (context, snapshot) {
+                                if (!snapshot.hasData) {
+                                  return Center(
+                                    child: CircularProgressIndicator(),
+                                  );
+                                }
+                                return DropdownButton<String>(
+                                  items: snapshot.requireData
+                                      .map<DropdownMenuItem<String>>((val) {
+                                    return DropdownMenuItem(
+                                        value: val,
+                                        child: Text(val,
+                                            style: TextStyle(
+                                                color: Colors.black)));
+                                  }).toList(),
+                                  onChanged: (val) {
+                                    setState(() {
+                                      branchSelected = val as String;
+                                    });
+                                  },
+                                  hint: Text(branchSelected),
+                                );
+                              }),
+                        ],
+                      ),
                       Builder(builder: (contect) {
                         return Row(
                           mainAxisAlignment: MainAxisAlignment.center,
@@ -107,6 +147,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 _studentyear = val!;
                                                 selectedYear = year[index];
                                               });
+                                              // BlocProvider.of<SubjectBloc>(
+                                              //     context)
+                                                // ..add(GetAllSubjects(
+                                                //     branch: branchSelected,
+                                                //     year: selectedYear)
+                                                    // );
                                             }),
                                       ],
                                     ))
@@ -156,6 +202,7 @@ class _RegisterPageState extends State<RegisterPage> {
   void submit() {
     if (_key.currentState!.validate()) {
       _authBloc.add(RegisterEvent(
+          branch: branchSelected,
           studentYear: selectedYear,
           email: _email.text.trim(),
           password: _password.text.trim(),

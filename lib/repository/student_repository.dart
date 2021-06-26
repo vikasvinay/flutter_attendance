@@ -2,18 +2,18 @@ import 'package:attendance_app/model/student_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UserRepository {
+class StudentRepository {
   FirebaseAuth firebaseAuth;
   FirebaseFirestore firebaseFirestore;
-  UserRepository(
+  StudentRepository(
       {FirebaseAuth? firebaseAuth, FirebaseFirestore? firebaseFirestore})
       : firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
         firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
-  Stream<StudentModel> getStudentDetails({required String uid}) {
+  Stream<StudentModel> getStudentDetails() {
     return firebaseFirestore
         .collection('users')
-        .doc(uid)
+        .doc(firebaseAuth.currentUser!.uid)
         .snapshots()
         .asyncMap((doc) => StudentModel.fromFireStore(doc: doc));
   }

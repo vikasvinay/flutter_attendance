@@ -1,5 +1,6 @@
+import 'package:attendance_app/model/all_subjects_model.dart';
 import 'package:attendance_app/model/subject_model.dart';
-import 'package:attendance_app/repository/attendance_repository.dart';
+import 'package:attendance_app/repository/all_subjects_repositort.dart';
 import 'package:attendance_app/repository/subject_repository.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,9 +10,9 @@ part 'subject_state.dart';
 
 class SubjectBloc extends Bloc<SubjectEvent, SubjectState> {
   SubJectRepository? subJectRepository = SubJectRepository();
-  AttendanceRepository? attendanceRepository = AttendanceRepository();
+  // AttendanceRepository? attendanceRepository = AttendanceRepository();
   SubjectBloc(this.subJectRepository) : super(SubjectState.initialState());
-
+  AllSubjectsRepository _allSubjectsRepository = AllSubjectsRepository();
   @override
   Stream<SubjectState> mapEventToState(SubjectEvent event) async* {
     if (event is EmptyEvent) {
@@ -25,7 +26,7 @@ class SubjectBloc extends Bloc<SubjectEvent, SubjectState> {
       await subJectRepository!.addSubject(subjectName: event.subjectName);
 
       yield SubjectState.initialState();
-    } 
+    }
     // else if (event is IncrementPresent) {
     //   await attendanceRepository!.addAttendance(
     //       isPresent: true,
@@ -40,11 +41,15 @@ class SubjectBloc extends Bloc<SubjectEvent, SubjectState> {
     //       studentUid: event.studentUid);
 
     //   yield SubjectState.changeState();
-    // } 
+    // }
     else if (event is DeleteSubject) {
       await subJectRepository!.deleteSubject(subjectName: event.subjectName);
       print(event.subjectName);
       yield SubjectState.deleteSubject();
+    } else if (event is GetAllSubjects) {
+      YearSubjects subjects = await _allSubjectsRepository.getYearSubjects(
+          year: event.year, branch: event.branch);
+      yield SubjectState.gotAllSubjects(subjects);
     }
   }
 }

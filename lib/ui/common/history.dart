@@ -27,6 +27,8 @@ class HistoryPage extends StatelessWidget {
   String? rawTime;
   final CommonWidget _commonWidget = CommonWidget();
   final int pageIndex = 0;
+  String? title;
+  String? subtitle;
   @override
   Widget build(BuildContext context) {
     Map<String, double> dataMap = {
@@ -179,6 +181,14 @@ class HistoryPage extends StatelessWidget {
                             )),
                       Builder(builder: (context) {
                         nextTime = time;
+                        if (log.subjectName!.contains('\n')) {
+                          var data = log.subjectName!.split('\n');
+                          title = data[0];
+                          subtitle = data[1];
+                        } else {
+                          title = log.subjectName;
+                          subtitle = log.attendance;
+                        }
                         return TimelineTile(
                           oppositeContents: Padding(
                             padding: EdgeInsets.only(right: 8.0),
@@ -190,10 +200,10 @@ class HistoryPage extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  '${log.subjectName}',
-                                  style: TextStyle(fontSize: 24.sp),
+                                  '$title',
+                                  style: TextStyle(fontSize: 20.sp),
                                 ),
-                                Text('• ${log.attendance}',
+                                Text('• $subtitle',
                                     style: TextStyle(fontSize: 16.sp))
                               ],
                             ),
