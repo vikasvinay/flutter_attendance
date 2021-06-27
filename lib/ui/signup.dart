@@ -1,5 +1,4 @@
 import 'package:attendance_app/bloc/auth/auth_bloc.dart';
-import 'package:attendance_app/bloc/subject/subject_bloc.dart';
 import 'package:attendance_app/repository/all_subjects_repositort.dart';
 import 'package:attendance_app/routing/fluro_route.dart';
 import 'package:attendance_app/routing/page_name.dart';

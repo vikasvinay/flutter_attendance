@@ -162,25 +162,22 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Container(
-                  width: 90.h,
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Text(
-                      subjectName.toUpperCase(),
-                      style: Theme.of(context).textTheme.subtitle1!..fontSize,
-                    ),
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Text(
+                    subjectName.toUpperCase(),
+                    style: Theme.of(context).textTheme.subtitle1!..fontSize,
                   ),
                 ),
-                Spacer(),
-                IconButton(
-                    onPressed: _deleteSubject,
-                    icon: Icon(
-                      Icons.delete,
-                      size: 18,
-                    ))
+                // Spacer(),
+                // IconButton(
+                //     onPressed: _deleteSubject,
+                //     icon: Icon(
+                //       Icons.delete,
+                //       size: 18,
+                //     ))
               ],
             ),
             // ListTile(

@@ -109,7 +109,7 @@ class _SuperhomeState extends State<Superhome> {
           ),
           Expanded(
             child: Text(
-              "Note: subject should be separated as eg(maths, english)",
+              "Note: subject should be separated as eg(RAS301, RCS702)",
               style: TextStyle(color: Colors.red),
             ),
           ),
@@ -124,7 +124,7 @@ class _SuperhomeState extends State<Superhome> {
       List<String> subjects = _subjects.text.split(',');
       List<String> data = [];
       for (int i = 0; i < subjects.length; i++) {
-        data.add(subjects[i].trim().toLowerCase());
+        data.add(subjects[i].trim());
       }
       await _authRepository
           .cerateMentor(

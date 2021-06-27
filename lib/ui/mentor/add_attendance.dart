@@ -72,6 +72,8 @@ class _AddAttendanceState extends State<AddAttendance> {
                 _dropDown(context,
                     title: 'Select Subject:',
                     items: widget.subjectsList,
+                    isbranch: false,
+                    isSubject:true,
                     isYear: false),
                 _dropDown(context, title: 'Year: ', items: year, isYear: true),
                 FutureBuilder<List<String>>(
@@ -126,8 +128,9 @@ class _AddAttendanceState extends State<AddAttendance> {
                         return Center(child: CircularProgressIndicator());
                       }
                       if (can) {
-                        checkVal =
-                            List.generate(snap.data!.length, (index) => false);
+                        checkVal = List.generate(
+                            snap.data!.length == 0 ? 1 : snap.data!.length,
+                            (index) => false);
 
                         can = false;
                       }
@@ -221,6 +224,7 @@ class _AddAttendanceState extends State<AddAttendance> {
       {required String title,
       required List items,
       required bool isYear,
+      bool isSubject = false,
       bool isbranch = false}) {
     return Builder(builder: (context) {
       return Container(
@@ -238,21 +242,20 @@ class _AddAttendanceState extends State<AddAttendance> {
               }).toList(),
               onChanged: (val) {
                 setState(() {
-                  if (!isYear) {
+                  if (isSubject) {
                     subjectName = val as String;
+                  }
+                  if (isbranch) {
+                    branchSelected = val as String;
                   }
                   if (isYear) {
                     studentYear = val as String;
-                  } else if (isbranch) {
-                    branchSelected = val as String;
                   }
                 });
               },
-              hint: Text(isbranch
-                  ? branchSelected
-                  : isYear
-                      ? studentYear
-                      : subjectName),
+              hint: isbranch
+                  ? Text(branchSelected)
+                  : isSubject ? Text(subjectName):Text(studentYear),
             )
           ],
         ),
