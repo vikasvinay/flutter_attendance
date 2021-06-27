@@ -32,9 +32,11 @@ class _AddAttendanceState extends State<AddAttendance> {
   int timeStamp = DateTime.now().millisecondsSinceEpoch;
   List<bool> checkVal = [];
   List<String> studentUids = [];
+
   String branchSelected = 'IT';
 
   bool can = true;
+  int studentsList = 0;
 
   @override
   void initState() {
@@ -73,7 +75,7 @@ class _AddAttendanceState extends State<AddAttendance> {
                     title: 'Select Subject:',
                     items: widget.subjectsList,
                     isbranch: false,
-                    isSubject:true,
+                    isSubject: true,
                     isYear: false),
                 _dropDown(context, title: 'Year: ', items: year, isYear: true),
                 FutureBuilder<List<String>>(
@@ -127,14 +129,15 @@ class _AddAttendanceState extends State<AddAttendance> {
                       if (!snap.hasData) {
                         return Center(child: CircularProgressIndicator());
                       }
+                      studentsList = snap.data!.length;
+
                       if (can) {
                         checkVal = List.generate(
                             snap.data!.length == 0 ? 1 : snap.data!.length,
                             (index) => false);
-
-                        can = false;
                       }
 
+                      print("$studentsList------------${checkVal.length}");
                       return ListView.builder(
                           shrinkWrap: true,
                           itemCount: snap.data!.length,
@@ -145,36 +148,17 @@ class _AddAttendanceState extends State<AddAttendance> {
                               leading: Checkbox(
                                   value: checkVal[index],
                                   onChanged: (val) {
+                                    can = false;
+
                                     setState(() {
                                       checkVal[index] = !checkVal[index];
                                     });
-                                    print(checkVal[index]);
                                   }),
                               title: Text(student.name!),
                             );
                           });
                     }),
 
-                // PaginateFirestore(
-                //   shrinkWrap: true,
-                //   query: FirebaseFirestore.instance
-                //       .collection('users')
-                //       .where('enrolled_subjects',
-                //           arrayContainsAny: widget.subjectsList)
-                //       .orderBy('name', descending: true),
-                //   itemBuilderType: PaginateBuilderType.listView,
-                //   itemBuilder: (int, context, DocumentSnapshot doc) {
-                //     StudentModel student = StudentModel.fromFireStore(doc: doc);
-                //     if (_mentorBloc.mentorModel!.uid != student.uid) {
-                //       return ListTile(
-                //         leading: Checkbox(value: true, onChanged: (val) {}),
-                //         title: Text(student.name),
-                //       );
-                //     } else {
-                //       return Container();
-                //     }
-                //   },
-                // ),
               ],
             ),
           ),
@@ -241,6 +225,10 @@ class _AddAttendanceState extends State<AddAttendance> {
                     child: Text(val, style: TextStyle(color: Colors.black)));
               }).toList(),
               onChanged: (val) {
+                // can = true;
+
+                // checkVal.clear();
+
                 setState(() {
                   if (isSubject) {
                     subjectName = val as String;
@@ -252,10 +240,13 @@ class _AddAttendanceState extends State<AddAttendance> {
                     studentYear = val as String;
                   }
                 });
+                studentUids = [];
               },
               hint: isbranch
                   ? Text(branchSelected)
-                  : isSubject ? Text(subjectName):Text(studentYear),
+                  : isSubject
+                      ? Text(subjectName)
+                      : Text(studentYear),
             )
           ],
         ),
@@ -265,6 +256,8 @@ class _AddAttendanceState extends State<AddAttendance> {
 
   void _save(BuildContext context) {
     print('save');
+    // print({checkVal.length, studentUids.toSet().toList().length});
+    // print(studentUids.toSet());
     for (int i = 0; i < studentUids.toSet().toList().length; i++) {
       print({checkVal[i], studentUids[i], subjectName, timeStamp});
       if (checkVal[i]) {
