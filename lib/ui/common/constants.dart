@@ -1,6 +1,6 @@
 var stream = <String>['IT', 'CSE', 'ECE'];
 
-var year = <String>['I', '	II', '	III', 'IV'];
+var year = <String>['I', 'II', 'III', 'IV'];
 
 // var subjects = <List<Map>>[
 //   [
