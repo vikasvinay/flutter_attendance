@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:attendance_app/model/student_model.dart';
+import 'package:attendance_app/repository/subject_repository.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -17,7 +18,7 @@ class AuthRepository {
         firebaseFirestore = firebaseFirestore ?? FirebaseFirestore.instance;
 
   StudentModel _studentModel = StudentModel();
-
+  SubJectRepository _subJectRepository = SubJectRepository();
   Future<bool> loginWithEmail(
       {required String email, required String password}) async {
     try {
@@ -38,12 +39,15 @@ class AuthRepository {
       required String branch,
       required String password}) async {
     try {
+      var subjectCodes =
+          await getSubjectCodes(branch: branch, year: studentYear);
       await firebaseAuth
           .createUserWithEmailAndPassword(email: email, password: password)
           .then((value) async {
         _studentModel.branch = branch;
         _studentModel.email = email;
-        _studentModel.enrolledSubjects = [];
+        _studentModel.enrolledSubjects = subjectCodes;
+
         _studentModel.name = name;
         _studentModel.photoUrl =
             'https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png';
@@ -56,23 +60,11 @@ class AuthRepository {
         await firebaseFirestore
             .collection('users')
             .doc(FirebaseAuth.instance.currentUser!.uid)
-            .set(
-                _studentModel.toFireStore()
-                // {
-                // 'uid': ,
-                //   'total_present':
-                //   'total_absent': FieldValue.increment(0),
-                //   'name': name,
-                //   'email': email,
-                //   'type': type,
-                //   'student_year': studentYear,
-
-                //   'photo_url':
-                //   'enrolled_subjects': []
-                // }
-                ,
-                SetOptions(merge: true));
+            .set(_studentModel.toFireStore(), SetOptions(merge: true));
       });
+      for (String code in subjectCodes) {
+        await _subJectRepository.addSubjectOnSignUp(subgectCode: code);
+      }
       return true;
     } on FirebaseAuthException catch (e) {
       log(e.message.toString());
@@ -125,5 +117,16 @@ class AuthRepository {
 
   Future<void> logOut() async {
     await firebaseAuth.signOut();
+  }
+
+  Future<List> getSubjectCodes(
+      {required String year, required String branch}) async {
+    var data = await FirebaseFirestore.instance
+        .collection('all_subjects')
+        .doc(branch)
+        .get();
+    var subjects = await data.get(year) as Map<String, dynamic>;
+    print(subjects.values.toList());
+    return subjects.values.toList();
   }
 }

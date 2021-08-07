@@ -24,3 +24,5 @@ var year = <String>['I', 'II', 'III', 'IV'];
 //     {'name': 'Computer Networks', 'code': 'RCS601'}
 //   ],
 // ];
+
+// var subjectCodes 

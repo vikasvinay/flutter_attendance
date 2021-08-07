@@ -104,15 +104,15 @@ class _SettingsState extends State<Settings> {
                           }
                         }),
                   ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(Icons.book),
-                    title: Text('Subjects'),
-                    onTap: () {
-                      FluroRouting.fluroRouter
-                          .navigateTo(context, PageName.subjects);
-                    },
-                  ),
+                  // Divider(),
+                  // ListTile(
+                  //   leading: Icon(Icons.book),
+                  //   title: Text('Subjects'),
+                  //   onTap: () {
+                  //     FluroRouting.fluroRouter
+                  //         .navigateTo(context, PageName.subjects);
+                  //   },
+                  // ),
                   Divider(),
                   ListTile(
                     leading: Icon(Icons.logout),

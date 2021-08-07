@@ -42,14 +42,14 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: () {
-            FluroRouting.fluroRouter.navigateTo(context, PageName.subjects);
-          }, //_popUp,
-          label: Text('Subject'),
-          icon: Icon(Icons.add),
-        ),
+        // floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+        // floatingActionButton: FloatingActionButton.extended(
+        //   onPressed: () {
+        //     FluroRouting.fluroRouter.navigateTo(context, PageName.subjects);
+        //   }, //_popUp,
+        //   label: Text('Subject'),
+        //   icon: Icon(Icons.add),
+        // ),
         bottomNavigationBar: StreamBuilder(
             stream: FirebaseFirestore.instance
                 .collection('users')

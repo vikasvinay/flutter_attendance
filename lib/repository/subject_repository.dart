@@ -42,8 +42,30 @@ class SubJectRepository {
         .set({
       'total_absent': FieldValue.increment(0),
       'total_present': FieldValue.increment(0),
-      'enrolled_subjects':
-          FieldValue.arrayUnion([subjectName.trim()])
+      'enrolled_subjects': FieldValue.arrayUnion([subjectName.trim()])
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> addSubjectOnSignUp({required String subgectCode}) async {
+    _subjectModel.absent = 0;
+    _subjectModel.present = 0;
+    _subjectModel.subjectName = subgectCode.trim();
+    _subjectModel.timestamp = Timestamp.fromDate(DateTime.now());
+    _subjectModel.subjectId = subgectCode.trim();
+    
+    DocumentReference<Map<String, dynamic>> docId = firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .collection('subjects')
+        .doc(subgectCode.trim());
+    await docId.set(_subjectModel.toFirestore(), SetOptions(merge: true));
+
+    await firebaseFirestore
+        .collection('users')
+        .doc(firebaseAuth.currentUser!.uid)
+        .set({
+      'total_absent': FieldValue.increment(0),
+      'total_present': FieldValue.increment(0),
     }, SetOptions(merge: true));
   }
 
